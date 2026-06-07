@@ -11,7 +11,7 @@ spec:
   source:
     path: src/app-groups/elk/scripts/local
     repoURL: https://github.com/balazskrizsan/argo_ubuntu
-    targetRevision: main
+    targetRevision: master
   syncPolicy:
     automated:
       prune: true
