@@ -1,0 +1,38 @@
+### App ###
+cluster_start/start-local/k8s-secrets/cloud-secrets-local-prod.yaml
+cluster_start/start/k8s-secrets/cloud-secrets-prod.yaml
+cluster_start/start/k8s-secrets/cloud-secrets-uat.yaml
+
+### Maven ###
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/

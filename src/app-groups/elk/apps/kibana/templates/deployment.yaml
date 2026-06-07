@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana
+  labels:
+    app: kibana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kibana
+  template:
+    metadata:
+      labels:
+        app: kibana
+    spec:
+      containers:
+        - name: kibana
+          image: docker.elastic.co/kibana/kibana:8.4.3
+          ports:
+            - containerPort: 5601
+          env:
+            - name: ELASTICSEARCH_HOSTS
+              value: "http://elasticsearch:9200"
+            - name: ELASTICSEARCH_USERNAME
+              value: "admin"
+            - name: ELASTICSEARCH_PASSWORD
+              value: "password"
+            - name: SERVER_SSL_ENABLED
+              value: "false"
+            - name: SERVER_HOST
+              value: "0.0.0.0"

@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: logstash-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  tls:
+    - hosts:
+        - "logstash.smart-scrum-poker.balazskrizsan.com"
+      secretName: env-ert
+  rules:
+    - host: "logstash.smart-scrum-poker.balazskrizsan.com"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: logstash
+                port:
+                  number: 9600

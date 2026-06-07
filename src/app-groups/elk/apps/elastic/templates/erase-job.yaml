@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: elasticsearch-erase-job
+  namespace: smart-scrum-poker-elk-local-common
+spec:
+#  schedule: "* * * * *"
+#  successfulJobsHistoryLimit: 2
+#  failedJobsHistoryLimit: 5
+#  jobTemplate:
+#    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: kubectl
+            image: kbalazsworks/kubernetes_job_base_image:0.3
+            imagePullPolicy: IfNotPresent
+            command: ["/bin/sh", "-c"]
+            args:
+              - |
+                indices=$(curl -s "http://elasticsearch:9200/_cat/indices?h=index" | tr '\n' ',' | sed 's/,$//')
+                curl -X DELETE "http://elasticsearch:9200/$indices"

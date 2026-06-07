@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ssp--elk-prod--app
+  namespace: argocd
+spec:
+  destination:
+    namespace: ssp--elk-prod
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: src/apps/elk/app/ubuntu
+    repoURL: https://github.com/balazskrizsan/argo_ubuntu
+    targetRevision: main
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: false
+    syncOptions:
+      - CreateNamespace=true

@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elastalert
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elastalert
+  template:
+    metadata:
+      labels:
+        app: elastalert
+      annotations:
+        rules-version: "v4"
+    spec:
+      containers:
+        - name: elastalert
+          image: jertel/elastalert2:latest
+          command:
+            - elastalert
+          args:
+            - --config
+            - /opt/elastalert/config/elastalert.yaml
+          envFrom:
+            - secretRef:
+                name: cloud-secrets
+          volumeMounts:
+            - name: config
+              mountPath: /opt/elastalert/config
+            - name: rules
+              mountPath: /opt/elastalert/rules
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 512Mi
+
+      volumes:
+        - name: config
+          configMap:
+            name: elastalert-config
+        - name: rules
+          configMap:
+            name: elastalert-rules

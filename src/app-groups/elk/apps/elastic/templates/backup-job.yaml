@@ -1,0 +1,80 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: elasticsearch-backup-job
+  namespace: smart-scrum-poker-elk-local-common
+spec:
+#  schedule: "* * * * *"
+#  successfulJobsHistoryLimit: 2
+#  failedJobsHistoryLimit: 5
+#  jobTemplate:
+#    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          initContainers:
+            - name: cleanup
+              image: busybox
+              command: [ "sh", "-c", "rm -rf /usr/share/elasticsearch/backup/*" ]
+              volumeMounts:
+                - name: backup-volume
+                  mountPath: /usr/share/elasticsearch/backup
+          volumes:
+            - name: backup-volume
+              persistentVolumeClaim:
+                claimName: elastic-backup-pvc
+          containers:
+          - name: kubectl
+            image: kbalazsworks/kubernetes_job_base_image:0.3
+            imagePullPolicy: IfNotPresent
+            envFrom:
+              - secretRef:
+                  name: cloud-secrets-elk
+            volumeMounts:
+              - name: backup-volume
+                mountPath: /usr/share/elasticsearch/backup
+            command: ["/bin/sh", "-c"]
+            args:
+              - |
+                aws configure set aws_access_key_id "$AWS_S3_SERVICE_ACCOUNT_ACCESS_KEY_ID"
+                aws configure set aws_secret_access_key "$AWS_S3_SERVICE_ACCOUNT_ACCESS_KEY"
+                aws configure set region "$AWS_S3_BACKUP_REGION"
+
+                SNAPSHOT_NAME="snapshot_$(date +%Y-%m-%d_%H:%M:%S)"
+                BACKUP_DIR="/usr/share/elasticsearch/backup"
+                RANDOM_STRING=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
+                REPO="backup_$RANDOM_STRING"
+
+                curl -X PUT "http://elasticsearch:9200/_snapshot/$REPO" \
+                  -H 'Content-Type: application/json' \
+                  -d '{
+                    "type": "fs",
+                    "settings": {
+                      "location": "'"$BACKUP_DIR"'"
+                    }
+                  }'
+
+                curl -X PUT "http://elasticsearch:9200/_snapshot/$REPO/$SNAPSHOT_NAME?wait_for_completion=true" \
+                  -H 'Content-Type: application/json' \
+                  -d '{
+                    "indices": "*",
+                    "include_global_state": true
+                  }'
+
+                mkdir /backup
+                zip -r "/backup/backup.zip" "$BACKUP_DIR"
+
+                aws s3 cp "/backup/backup.zip" "s3://$AWS_S3_BACKUP_BUCKET$AWS_S3_BACKUP_SSP_ELASTIC_PATH/$SNAPSHOT_NAME.zip"
+
+                echo "$SNAPSHOT_NAME.zip" > "/backup/latest.txt"
+                aws s3 cp "/backup/latest.txt" "s3://$AWS_S3_BACKUP_BUCKET$AWS_S3_BACKUP_SSP_ELASTIC_PATH/latest.txt"
+
+                echo "$REPO" > "/backup/latest_repo.txt"
+                aws s3 cp "/backup/latest_repo.txt" "s3://$AWS_S3_BACKUP_BUCKET$AWS_S3_BACKUP_SSP_ELASTIC_PATH/latest_repo.txt"
+
+                ls -hal /backup
+                rm -rf /backup
+
+                curl -X DELETE "http://elasticsearch:9200/_snapshot/$REPO/$SNAPSHOT_NAME"
+
+                curl -X DELETE "http://elasticsearch:9200/_snapshot/$REPO"

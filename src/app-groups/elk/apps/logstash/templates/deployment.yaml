@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logstash
+  labels:
+    app: logstash
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logstash
+  template:
+    metadata:
+      labels:
+        app: logstash
+      annotations:
+        configmap-version: "v4"
+    spec:
+      containers:
+        - name: logstash
+          image: docker.elastic.co/logstash/logstash:8.4.3
+          ports:
+            - containerPort: 5044
+            - containerPort: 9600
+          volumeMounts:
+            - name: config-files
+              mountPath: /usr/share/logstash/pipeline/logstash.conf
+              subPath: logstash.conf
+            - name: config-files
+              mountPath: /usr/share/logstash/config/logstash.yml
+              subPath: logstash.yml
+      volumes:
+        - name: config-files
+          configMap:
+            name: config-files
