@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aws-services
+  labels:
+    app: aws-services
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: aws-services
+  template:
+    metadata:
+      labels:
+        app: aws-services
+        service: aws-services
+    spec:
+      containers:
+        - name: aws-services
+          image: placeholder:placeholder
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 200m
+              memory: 200Mi
+            limits:
+              cpu: 400m
+              memory: 400Mi
+          envFrom:
+            - configMapRef:
+                name: backend-config
+            - secretRef:
+                name: backend-secrets
+          env:
+            - name: spring.profiles.active
+              value: native
