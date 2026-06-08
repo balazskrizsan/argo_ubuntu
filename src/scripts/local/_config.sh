@@ -10,6 +10,7 @@ export ENV_CERT_NAMESPACES=(
 
 export ARGO_APPS=(
   "elk"
+  "ssp"
 )
 
 set_or_update_cert() {
