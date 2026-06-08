@@ -5,6 +5,4 @@ resources:
   - backup-job.yaml
   - backup-pvc.yaml
   - deployment.yaml
-  - erase-job.yaml
-  - restore-job.yaml
   - service.yaml
