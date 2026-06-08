@@ -4,7 +4,6 @@ namespace: ssp-local
 
 resources:
   - config
-  - ../../templates
 
 patches:
   - target: { group: "apps", version: "v1", kind: "Deployment", name: "aws-services" }
