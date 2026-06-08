@@ -27,11 +27,18 @@ set_or_update_cert() {
 
 toggle_argo_app() {
   local command="$1"
-  local namespace="$2"
-  local env="$3"
-  local app="$4"
+  local env="$2"
+  local app="$3"
 
-  echo "Argo app: $command => $namespace / $env / $app"
+  echo "Argo app: $command => $env / $app"
 
-  kubectl $command -f "./../../argo-apps/$env/$namespace--$app--app.yaml"
+  goto_src
+
+  cd "argo-apps/$env/" || exit
+
+  kubectl $command -f "./$app--$env--app.yaml"
+}
+
+goto_src() {
+  cd "./../../" || exit
 }
