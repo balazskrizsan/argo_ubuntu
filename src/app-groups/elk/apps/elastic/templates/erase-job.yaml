@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: elasticsearch-erase-job
-  namespace: smart-scrum-poker-elk-local-common
+  namespace: elk-local
 spec:
 #  schedule: "* * * * *"
 #  successfulJobsHistoryLimit: 2

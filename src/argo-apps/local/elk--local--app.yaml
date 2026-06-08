@@ -5,7 +5,7 @@ metadata:
   namespace: argocd
 spec:
   destination:
-    namespace: ssp--elk-local
+    namespace: elk-local
     server: https://kubernetes.default.svc
   project: default
   source:
