@@ -22,9 +22,6 @@ spec:
           args:
             - --config
             - /opt/elastalert/config/elastalert.yaml
-          envFrom:
-            - secretRef:
-                name: cloud-secrets
           volumeMounts:
             - name: config
               mountPath: /opt/elastalert/config
