@@ -3,6 +3,4 @@ kind: Kustomization
 
 resources:
   - ../templates
-
-patches:
-  - path: rules.yaml
+  - rules.yaml
