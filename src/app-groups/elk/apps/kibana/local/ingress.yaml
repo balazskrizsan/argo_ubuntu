@@ -9,10 +9,10 @@ metadata:
 spec:
   tls:
     - hosts:
-        - kibana--smart-scrum-poker.localhost.balazskrizsan.com
+        - kibana--elk.localhost.balazskrizsan.com
       secretName: env-cert
   rules:
-    - host: kibana--smart-scrum-poker.localhost.balazskrizsan.com
+    - host: kibana--elk.localhost.balazskrizsan.com
       http:
         paths:
           - path: /
