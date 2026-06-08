@@ -11,3 +11,25 @@ patches:
       - op: replace
         path: /spec/template/spec/containers/0/image
         value: kbalazsworks/smart_scrum_poker_v2_aws_services:commit_sha_short_02d817b
+        value: psql-local-prod-persistent-volume-claim
+
+  - target: { group: "", version: "v1", kind: "Service", name: "aws-services" }
+    patch: |-
+      - op: replace
+        path: /spec/type
+        value: LoadBalancer
+
+  - target: { group: "networking.k8s.io",  version: "v1", kind: "Ingress", name: "aws-services" }
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/http/paths/0/backend/service/port/number
+        value: 1234
+
+      - op: replace
+        path: /spec/rules/0/host
+        value: api--aws-services.localhost.balazskrizsan.com
+
+      - op: replace
+        path: /spec/tls/0/hosts
+        value:
+          - api--aws-services.localhost.balazskrizsan.com
