@@ -28,7 +28,7 @@ spec:
 
               curl -o "/certs/current_folder.txt" "${AWS_S3_CERTIFICATE_FOLDER}current_version.txt"
               cat /certs/current_folder.txt
-              CURRENT_FOLDER=$(< /certs/current_folder.txt)
+              CURRENT_FOLDER="$(cat /certs/current_folder.txt)"
               
               echo "===================================="
               echo "===================================="
