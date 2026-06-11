@@ -19,6 +19,10 @@ patches:
         path: /spec/type
         value: LoadBalancer
 
+      - op: replace
+        path: /spec/ports/0/port
+        value: 1234
+
   - target: { group: "networking.k8s.io",  version: "v1", kind: "Ingress", name: "aws-services" }
     patch: |-
       - op: replace
