@@ -31,7 +31,9 @@ spec:
               memory: 400Mi
           envFrom:
             - configMapRef:
-                name: backend-config
+                name: aws-services-config
+            - secretRef:
+                name: aws-services-secrets
           env:
             - name: spring.profiles.active
               value: native

@@ -6,12 +6,7 @@ generatorOptions:
   disableNameSuffixHash: true
 
 configMapGenerator:
-  - name: backend-config
+  - name: aws-services-config
     namespace: ssp-local
     literals:
-      - AWS_ACCESS_KEY_ID=
-      - AWS_REGION=
-      - AWS_SECRET_ACCESS_KEY=
-      - SERVER_SSL_ENABLED=true
-      - SERVER_SSL_KEY_STORE=classpath:keystore/certificate.p12
-      - SERVER_SSL_KEY_STORE_PASSWORD=password
+      - A=B

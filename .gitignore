@@ -1,7 +1,5 @@
 ### App ###
-cluster_start/start-local/k8s-secrets/cloud-secrets-local-prod.yaml
-cluster_start/start/k8s-secrets/cloud-secrets-prod.yaml
-cluster_start/start/k8s-secrets/cloud-secrets-uat.yaml
+!src/secerts/*.tpl
 
 ### Maven ###
 target/
