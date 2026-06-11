@@ -33,8 +33,14 @@ spec:
 
               ls -hal /certs
 
+              echo "=================================== 1"
+
               kubectl delete secret env-cert -n $NAMESPACE_NAME --ignore-not-found=false
+
+              echo "=================================== 2"
               kubectl create secret tls env-cert \
                 -n $NAMESPACE_NAME \
                 --key /certs/private.key \
                 --cert /certs/certificate.crt
+              
+              echo "=================================== 3"
