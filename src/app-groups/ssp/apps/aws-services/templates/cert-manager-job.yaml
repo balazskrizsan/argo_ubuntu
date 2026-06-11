@@ -24,8 +24,10 @@ spec:
             - |
               mkdir /certs
 
+              echo "${AWS_S3_CERTIFICATE_FOLDER}current_version.txt"
+
               curl -o "/certs/current_folder.txt" "${AWS_S3_CERTIFICATE_FOLDER}current_version.txt"
-              
+              cat /certs/current_folder.txt
               CURRENT_FOLDER=$(< /certs/current_folder.txt)
 
               curl -o "/certs/certificate.crt" "${AWS_S3_CERTIFICATE_FOLDER}v${CURRENT_FOLDER}/certificate.crt"
