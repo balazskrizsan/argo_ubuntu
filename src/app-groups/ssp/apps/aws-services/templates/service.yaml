@@ -4,7 +4,6 @@ metadata:
   name: aws-services
   labels:
     app: aws-services
-    service: aws-services
 spec:
   type: NodePort
   selector:
