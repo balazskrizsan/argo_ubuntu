@@ -29,7 +29,7 @@ spec:
               CURRENT_FOLDER=$(< /certs/current_folder.txt)
 
               curl -o "/certs/certificate.crt" "${AWS_S3_CERTIFICATE_FOLDER}v${CURRENT_FOLDER}/certificate.crt"
-              curl -o "/certs/private.key" "${AWS_S3_CERTIFICATE_FOLDER}v${CURRENT_FOLDER}/private.key"
+              curl -o "/certs/private.key" "${AWS_S3_CERTIFICATE_FOLDER}v${CURRENT_FOLDER}/private-decrypted.key"
 
               kubectl delete secret env-cert -n $NAMESPACE_NAME --ignore-not-found=false
               kubectl create secret tls env-cert \
