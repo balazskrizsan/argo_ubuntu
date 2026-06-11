@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cert-manager-job
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: kubectl
+          image: kbalazsworks/kubernetes_job_base_image:0.1
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          envFrom:
+            - secretRef:
+                name: cloud-secrets
+            - configMapRef:
+                name: namespace-config
+          args:
+            - |
+              mkdir /certs
+
+              curl -o "/certs/current_folder.txt" "${AWS_S3_CERTIFICATE_FOLDER}current_version.txt"
+              
+              CURRENT_FOLDER=$(< /certs/current_folder.txt)
+
+              curl -o "/certs/certificate.crt" "${AWS_S3_CERTIFICATE_FOLDER}v${CURRENT_FOLDER}/certificate.crt"
+              curl -o "/certs/private.key" "${AWS_S3_CERTIFICATE_FOLDER}v${CURRENT_FOLDER}/private.key"
+
+              kubectl delete secret env-cert -n $NAMESPACE_NAME --ignore-not-found=false
+              kubectl create secret tls env-cert \
+                -n $NAMESPACE_NAME \
+                --key /certs/private.key \
+                --cert /certs/certificate.crt
