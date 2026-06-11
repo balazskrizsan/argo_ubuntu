@@ -35,6 +35,11 @@ spec:
 
               echo "=================================== 1"
 
+              cat /certs/certificate.crt
+              cat /certs/private.key
+
+              echo "=================================== 1"
+
               kubectl delete secret env-cert -n $NAMESPACE_NAME --ignore-not-found=false
 
               echo "=================================== 2"
