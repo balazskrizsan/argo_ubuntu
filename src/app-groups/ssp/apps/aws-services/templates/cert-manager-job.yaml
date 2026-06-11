@@ -29,6 +29,12 @@ spec:
               curl -o "/certs/current_folder.txt" "${AWS_S3_CERTIFICATE_FOLDER}current_version.txt"
               cat /certs/current_folder.txt
               CURRENT_FOLDER=$(< /certs/current_folder.txt)
+              
+              echo "===================================="
+              echo "===================================="
+              echo "$CURRENT_FOLDER"
+              echo "===================================="
+              echo "===================================="
 
               curl -o "/certs/certificate.crt" "${AWS_S3_CERTIFICATE_FOLDER}v${CURRENT_FOLDER}/certificate.crt"
               curl -o "/certs/private.key" "${AWS_S3_CERTIFICATE_FOLDER}v${CURRENT_FOLDER}/private-decrypted.key"
