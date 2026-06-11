@@ -9,4 +9,4 @@ configMapGenerator:
   - name: aws-services-config
     namespace: ssp-local
     literals:
-      - A=B
+      - SERVER_SSL_ENABLED=false
