@@ -3,7 +3,7 @@ kind: Kustomization
 namespace: ssp-local
 
 resources:
-  - config
+  - app-config
   - ../templates
 
 patches:
