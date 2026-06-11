@@ -31,6 +31,9 @@ spec:
               curl -o "/certs/certificate.crt" "${AWS_S3_CERTIFICATE_FOLDER}v${CURRENT_FOLDER}/certificate.crt"
               curl -o "/certs/private.key" "${AWS_S3_CERTIFICATE_FOLDER}v${CURRENT_FOLDER}/private-decrypted.key"
 
+              echo "${AWS_S3_CERTIFICATE_FOLDER}v${CURRENT_FOLDER}/certificate.crt"
+              echo "${AWS_S3_CERTIFICATE_FOLDER}v${CURRENT_FOLDER}/private-decrypted.key"
+
               ls -hal /certs
 
               echo "=================================== 1"
