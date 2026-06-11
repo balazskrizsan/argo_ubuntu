@@ -3,11 +3,12 @@ kind: Service
 metadata:
   name: aws-services
   labels:
-    app: aws-services
+    app: aws-services-label
+    service: aws-services
 spec:
   type: NodePort
   selector:
-    app: aws-services
+    app: aws-services-label
     service: aws-services
   ports:
     - name: http
