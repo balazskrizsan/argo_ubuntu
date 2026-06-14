@@ -6,7 +6,7 @@ generatorOptions:
   disableNameSuffixHash: true
 
 configMapGenerator:
-  - name: aws-services-config
+  - name: ids-config
     namespace: ssp-local
     literals:
       - Certificate__Password=password
