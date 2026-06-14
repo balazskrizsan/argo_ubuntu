@@ -41,3 +41,11 @@ patches:
         path: /spec/tls/0/hosts
         value:
           - ids--smart-scrum-poker.localhost.balazskrizsan.com
+
+### PSQL
+
+  - target: { group: "", version: "v1", kind: "Service", name: "ids-psql-service" }
+    patch: |-
+      - op: replace
+        path: /spec/ports/0/port
+        value: 3022
