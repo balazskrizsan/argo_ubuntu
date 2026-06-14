@@ -48,7 +48,13 @@ patches:
     patch: |-
       - op: replace
         path: /spec/ports/0/port
-        value: 3022
+        value: 4053
+
+  - target: { group: "", version: "v1", kind: "Service", name: "ids-psql-service" }
+    patch: |-
+      - op: replace
+        path: /spec/type
+        value: LoadBalancer
 
   - target: { group: "apps", version: "v1", kind: "Deployment", name: "ids-psql" }
     patch: |-

@@ -15,7 +15,7 @@ configMapGenerator:
     literals:
       - Certificate__Password=password
       - IdentityServer__IssuerUri=https://ids--smart-scrum-poker.localhost.balazskrizsan.com
-      - ConnectionStrings__DefaultConnection="Host=localhost;Port=4050;Database=app_db;Username=admin;Password=password"
+      - ConnectionStrings__DefaultConnection="Host=ids-psql-service;Port=4053;Database=app_db;Username=admin;Password=password"
       - IdentityServer__Port=4043
       - Certificate__Path=keystore/certificate.pfx
       - IdentityServer__FrontendCorsOrigin=https://localhost.balazskrizsan.com:3010
