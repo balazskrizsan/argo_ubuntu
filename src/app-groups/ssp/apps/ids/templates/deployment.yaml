@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ids
+  labels:
+    app: ids-label
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: ids
+  template:
+    metadata:
+      labels:
+        app: ids-label
+        service: ids
+    spec:
+      containers:
+        - name: ids
+          image: placeholder:placeholder
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 200m
+              memory: 200Mi
+            limits:
+              cpu: 400m
+              memory: 400Mi
+#          envFrom:
+#            - configMapRef:
+#                name: ids-config
+#            - secretRef:
+#                name: ids-secrets
