@@ -49,3 +49,9 @@ patches:
       - op: replace
         path: /spec/ports/0/port
         value: 3022
+
+  - target: { group: "apps", version: "v1", kind: "Deployment", name: "ids-psql" }
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/volumes/0/persistentVolumeClaim/claimName
+        value: ssp--ids--local--psql--persistent-volume-claim
