@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: ssp-local
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+  - name: aws-services-config
+    namespace: ssp-local
+    literals:
+      - Certificate__Password=password
+      - IdentityServer__IssuerUri=https://ids--smart-scrum-poker.localhost.balazskrizsan.com
+      - ConnectionStrings__DefaultConnection="Host=localhost;Port=4050;Database=app_db;Username=admin;Password=password"
+      - IdentityServer__Port=4043
+      - Certificate__Path=keystore/certificate.pfx
+      - IdentityServer__FrontendCorsOrigin=https://localhost.balazskrizsan.com:3010
+      - IdentityServer__FrontendRedirectUri=https://localhost.balazskrizsan.com:3010/auth-callback

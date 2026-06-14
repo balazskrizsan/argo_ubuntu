@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: ssp-local
 
 resources:
+  - app-config
   - ../templates
 
 patches:
@@ -20,7 +21,7 @@ patches:
 
       - op: replace
         path: /spec/ports/0/port
-        value: 4040
+        value: 4043
 
       - op: add
         path: /spec/ports/0/nodePort
@@ -30,7 +31,7 @@ patches:
     patch: |-
       - op: replace
         path: /spec/rules/0/http/paths/0/backend/service/port/number
-        value: 4040
+        value: 4043
 
       - op: replace
         path: /spec/rules/0/host
