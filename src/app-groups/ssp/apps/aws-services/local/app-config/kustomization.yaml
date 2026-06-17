@@ -10,3 +10,4 @@ configMapGenerator:
     namespace: ssp-local
     literals:
       - SERVER_SSL_ENABLED=false
+      - OIDC_INTROSPECTION_URI=https://ids--smart-scrum-poker.localhost.balazskrizsan.com/connect/introspect
