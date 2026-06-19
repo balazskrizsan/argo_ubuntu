@@ -18,5 +18,5 @@ configMapGenerator:
       - ConnectionStrings__DefaultConnection="Host=ids-psql-service;Port=4053;Database=app_db;Username=admin;Password=admin_pass"
       - IdentityServer__Port=8080
       - Certificate__Path=keystore/certificate.pfx
-      - IdentityServer__FrontendCorsOrigin=https://localhost.balazskrizsan.com:3010
-      - IdentityServer__FrontendRedirectUri=https://localhost.balazskrizsan.com:3010/auth-callback
+      - IdentityServer__FrontendCorsOrigin=https://smartscrumpoker.localhost.balazskrizsan.com/
+      - IdentityServer__FrontendRedirectUri=https://smartscrumpoker.localhost.balazskrizsan.com/auth-callback
