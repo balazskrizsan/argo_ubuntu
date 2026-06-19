@@ -15,7 +15,7 @@ configMapGenerator:
     literals:
       - Certificate__Password=password
       - IdentityServer__IssuerUri=https://ids--smartscrumpoker.localhost.balazskrizsan.com/
-      - ConnectionStrings__DefaultConnection="Host=ids-psql-service;Port=4053;Database=app_db;Username=admin;Password=password"
+      - ConnectionStrings__DefaultConnection="Host=ids-psql-service;Port=4053;Database=app_db;Username=admin;Password=admin_pass"
       - IdentityServer__Port=8080
       - Certificate__Path=keystore/certificate.pfx
       - IdentityServer__FrontendCorsOrigin=https://localhost.balazskrizsan.com:3010
