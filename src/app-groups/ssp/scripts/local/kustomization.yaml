@@ -6,3 +6,4 @@ resources:
   - ../../apps/common/local
   - ../../apps/aws-services/local
   - ../../apps/ids/local
+  - ../../apps/backend/local
