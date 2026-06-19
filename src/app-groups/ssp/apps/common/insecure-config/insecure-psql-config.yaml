@@ -5,6 +5,6 @@ metadata:
 data:
   POSTGRES_DB: "app_db"
   POSTGRES_USER: "admin"
-  POSTGRES_PASSWORD: "password"
+  POSTGRES_PASSWORD: "admin_pass"
   postgresql.conf: |
     data_directory = /var/lib/postgresql/data/data-directory
