@@ -1,0 +1,63 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: ssp-local
+
+resources:
+  - app-config
+  - ../templates
+
+patches:
+  - target: { group: "apps", version: "v1", kind: "Deployment", name: "backend" }
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: kbalazsworks/smart_scrum_poker_v2_backend:commit_sha_short_758e2a9
+
+  - target: { group: "", version: "v1", kind: "Service", name: "backend" }
+    patch: |-
+      - op: replace
+        path: /spec/type
+        value: LoadBalancer
+
+      - op: replace
+        path: /spec/ports/0/port
+        value: 4003
+
+      - op: add
+        path: /spec/ports/0/nodePort
+        value: 30405
+
+  - target: { group: "networking.k8s.io",  version: "v1", kind: "Ingress", name: "backend" }
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/http/paths/0/backend/service/port/number
+        value: 4003
+
+      - op: replace
+        path: /spec/rules/0/host
+        value: api--smartscrumpoker.localhost.balazskrizsan.com
+
+      - op: replace
+        path: /spec/tls/0/hosts
+        value:
+          - api--smartscrumpoker.localhost.balazskrizsan.com
+
+### PSQL
+
+  - target: { group: "", version: "v1", kind: "Service", name: "backend-psql-service" }
+    patch: |-
+      - op: replace
+        path: /spec/ports/0/port
+        value: 4013
+
+  - target: { group: "", version: "v1", kind: "Service", name: "backend-psql-service" }
+    patch: |-
+      - op: replace
+        path: /spec/type
+        value: LoadBalancer
+
+  - target: { group: "apps", version: "v1", kind: "Deployment", name: "backend-psql" }
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/volumes/0/persistentVolumeClaim/claimName
+        value: ssp--backend--local--psql--persistent-volume-claim

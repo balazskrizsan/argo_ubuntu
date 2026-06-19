@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-psql-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 1111
+      targetPort: 5432
+  selector:
+    app: backend-psql-label
