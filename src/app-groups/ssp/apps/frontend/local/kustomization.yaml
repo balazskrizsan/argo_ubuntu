@@ -15,10 +15,6 @@ patches:
   - target: { group: "", version: "v1", kind: "Service", name: "frontend" }
     patch: |-
       - op: replace
-        path: /spec/type
-        value: LoadBalancer
-
-      - op: replace
         path: /spec/ports/0/port
         value: 4033
 
