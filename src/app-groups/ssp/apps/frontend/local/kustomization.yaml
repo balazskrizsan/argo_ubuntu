@@ -10,7 +10,7 @@ patches:
     patch: |-
       - op: replace
         path: /spec/template/spec/containers/0/image
-        value: kbalazsworks/smart_scrum_poker_v2_frontend:local_commit_sha_short_9c586cf
+        value: kbalazsworks/smart_scrum_poker_v2_frontend:local_commit_sha_short_1beb40b
 
   - target: { group: "", version: "v1", kind: "Service", name: "frontend" }
     patch: |-
