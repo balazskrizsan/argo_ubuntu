@@ -15,6 +15,6 @@ spec:
             path: "/(.*)"
             backend:
               service:
-                name: ssp-frontend
+                name: frontend
                 port:
                   number: 1111
