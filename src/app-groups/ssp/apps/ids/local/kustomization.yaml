@@ -37,10 +37,12 @@ patches:
         path: /spec/rules/0/host
         value: ids--smart-scrum-poker.localhost.balazskrizsan.com
 
-      - op: replace
-        path: /spec/tls/0/hosts
+      - op: add
+        path: /spec/tls
         value:
-          - ids--smart-scrum-poker.localhost.balazskrizsan.com
+          - hosts:
+              - smartscrumpoker.localhost.balazskrizsan.com
+            secretName: env-cert
 
 ### PSQL
 
