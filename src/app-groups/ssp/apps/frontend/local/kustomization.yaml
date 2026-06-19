@@ -22,7 +22,7 @@ patches:
         path: /spec/ports/0/port
         value: 4033
 
-  - target:{ group: "networking.k8s.io",  version: "v1", kind: "Ingress", name: "frontend" }
+  - target: { group: "networking.k8s.io",  version: "v1", kind: "Ingress", name: "frontend" }
     patch: |-
       - op: replace
         path: /spec/rules/0/http/paths/0/backend/service/port/number
