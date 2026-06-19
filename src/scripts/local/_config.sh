@@ -1,12 +1,13 @@
 #!/bin/bash
 
-NAMESPACES=(
-  "argocd"
+export APP_NAMESPACES=(
+  "ssp-local"
 )
 
 export ENV_CERT_NAMESPACES=(
   "argocd"
 )
+ENV_CERT_NAMESPACES+=("${APP_NAMESPACES[@]}")
 
 export ARGO_APPS=(
   "elk"
