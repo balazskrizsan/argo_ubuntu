@@ -11,7 +11,7 @@ patches:
     patch: |-
       - op: replace
         path: /spec/template/spec/containers/0/image
-        value: kbalazsworks/smart_scrum_poker_v2_identity_service:commit_sha_short_e4b81ac
+        value: kbalazsworks/smart_scrum_poker_v2_identity_service:commit_sha_short_e3707fa
 
   - target: { group: "", version: "v1", kind: "Service", name: "ids" }
     patch: |-
