@@ -52,3 +52,11 @@ spec:
                 name: ids-config
 #            - secretRef:
 #                name: ids-secrets
+          volumeMounts:
+            - name: dpkeys
+              mountPath: /var/dpkeys
+
+      volumes:
+        - name: dpkeys
+          persistentVolumeClaim:
+            claimName: ids-dp-pvc

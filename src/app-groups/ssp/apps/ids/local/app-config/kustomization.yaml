@@ -5,6 +5,8 @@ namespace: ssp-local
 resources:
   - ssp--ids--local--psql--persistent-volume.yaml
   - ssp--ids--local--psql--persistent-volume-claim.yaml
+  - ssp--ids--local--dp-persistent-volume.yaml
+  - ssp--ids--local--dp-persistent-volume-claim.yaml
 
 generatorOptions:
   disableNameSuffixHash: true
