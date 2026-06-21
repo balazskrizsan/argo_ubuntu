@@ -54,7 +54,7 @@ spec:
 #                name: ids-secrets
           volumeMounts:
             - name: dpkeys
-              mountPath: /var/dpkeys
+              mountPath: /mnt/k8s/ids-dpkeys
 
       volumes:
         - name: dpkeys
