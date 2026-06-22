@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-files
+  namespace: smart-scrum-poker-elk-common
+data:
+  logstash.conf: |
+    input {
+      tcp {
+        port => 5044
+        codec => json
+      }
+    }
+
+    filter {
+      mutate { lowercase => ["env"] }
+      if ![env] {
+        mutate { add_field => { "env" => "unknown" } }
+      }
+      if [env] in ["dev", "local_prod", "uat", "prod"] {
+        mutate { add_field => { "target_index" => "ssp-%{env}-logs-short-term" } }
+        if [long_term] == "true" {
+          mutate { add_field => { "long_term_target_index" => "ssp-%{env}-logs-long-term" } }
+        }
+      } else {
+        mutate { add_field => { "target_index" => "logs-fallback" } }
+      }
+    }
+
+    output {
+      if [long_term_target_index] {
+        elasticsearch {
+          hosts => ["http://elasticsearch:9200"]
+          index => "%{long_term_target_index}"
+        }
+      } else {
+        elasticsearch {
+          hosts => ["http://elasticsearch:9200"]
+          index => "%{target_index}"
+        }
+      }
+    }
+
+  logstash.yml: |
+    http.host: "0.0.0.0"
+    http.port: 9600
+    xpack.monitoring.enabled: true
+    xpack.monitoring.elasticsearch.hosts: ["http://elasticsearch:9200"]
+    log.level: info
+    path.logs: /var/log/logstash
