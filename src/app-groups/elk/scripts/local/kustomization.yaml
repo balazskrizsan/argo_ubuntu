@@ -4,5 +4,5 @@ kind: Kustomization
 resources:
 #  - ../../apps/elastalert/local
   - ../../apps/elastic/local
-#  - ../../apps/kibana/local
+  - ../../apps/kibana/local
   - ../../apps/logstash/local
