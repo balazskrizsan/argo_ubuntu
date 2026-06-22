@@ -5,4 +5,4 @@ resources:
 #  - ../../apps/elastalert/local
   - ../../apps/elastic/local
 #  - ../../apps/kibana/local
-#  - ../../apps/logstash/local
+  - ../../apps/logstash/local
