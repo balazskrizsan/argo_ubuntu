@@ -4,7 +4,7 @@ metadata:
   name: ssp--ids--local--dp-persistent-volume-claim
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   storageClassName: manual
   resources:
     requests:
