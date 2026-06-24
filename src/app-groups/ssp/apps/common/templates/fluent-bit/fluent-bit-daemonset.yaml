@@ -27,6 +27,13 @@ spec:
           export LANGUAGE=$(cat /env-config/language)
           export LOGSTASH_HOST=$(cat /env-config/logstash_host)
           export LOGSTASH_PORT=$(cat /env-config/logstash_port)
+
+          echo "APP_NAME: $APP_NAME"
+          echo "ENV: $ENV"
+          echo "LANGUAGE: $LANGUAGE"
+          echo "LOGSTASH_HOST: $LOGSTASH_HOST"
+          echo "LOGSTASH_PORT: $LOGSTASH_PORT"
+
           cp /fluent-bit-config-source/fluent-bit.conf /fluent-bit-config/fluent-bit.conf
           cp /fluent-bit-config-source/parsers.conf /fluent-bit-config/parsers.conf
           envsubst < /fluent-bit-config/fluent-bit.conf > /fluent-bit-config/fluent-bit.conf.tmp
