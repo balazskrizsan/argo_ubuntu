@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
   - namespace-config.yaml
-  - ../../apps/common/local
+  - ../../apps/common/templates/cert-manager
   - ../../apps/common/templates/fluent-bit
   - ../../apps/aws-services/local
   - ../../apps/ids/local
