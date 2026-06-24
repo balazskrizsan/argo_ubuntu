@@ -11,3 +11,8 @@ resources:
   - secret-manager/set-cluster-role-binding.yaml
   - secret-manager/set-role.yaml
   - secret-manager/set-role-binding.yaml
+  - fluent-bit/service-account.yaml
+  - fluent-bit/set-cluster-role.yaml
+  - fluent-bit/set-cluster-role-binding.yaml
+  - fluent-bit/set-role.yaml
+  - fluent-bit/set-role-binding.yaml

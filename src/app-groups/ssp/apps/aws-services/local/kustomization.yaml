@@ -5,6 +5,7 @@ namespace: ssp-local
 resources:
   - app-config
   - ../templates
+  - ../../common/templates/fluent-bit
 
 patches:
   - target: { group: "apps", version: "v1", kind: "Deployment", name: "aws-services" }
@@ -37,3 +38,15 @@ patches:
         path: /spec/tls/0/hosts
         value:
           - api--aws-services--smartscrumpoker.localhost.balazskrizsan.com
+
+### Fluent Bit
+
+  - target: { group: "", version: "v1", kind: "ConfigMap", name: "fluent-bit-env" }
+    patch: |-
+      - op: replace
+        path: /data/app_name
+        value: aws-services
+
+      - op: replace
+        path: /data/language
+        value: java
