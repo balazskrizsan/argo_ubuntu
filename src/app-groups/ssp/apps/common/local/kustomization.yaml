@@ -3,5 +3,4 @@ kind: Kustomization
 namespace: ssp-local
 
 resources:
-  - ../templates/cert-manager/cert-manager-job.yaml
   - ../insecure-config
