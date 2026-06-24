@@ -5,6 +5,7 @@ namespace: ssp-local
 resources:
   - app-config
   - ../templates
+  - ../../common/templates/fluent-bit
 
 patches:
   - target: { group: "apps", version: "v1", kind: "Deployment", name: "backend" }
@@ -61,3 +62,15 @@ patches:
       - op: replace
         path: /spec/template/spec/volumes/0/persistentVolumeClaim/claimName
         value: ssp--backend--local--psql--persistent-volume-claim
+
+### Fluent Bit
+
+  - target: { group: "", version: "v1", kind: "ConfigMap", name: "fluent-bit-env" }
+    patch: |-
+      - op: replace
+        path: /data/app_name
+        value: backend
+
+      - op: replace
+        path: /data/language
+        value: java

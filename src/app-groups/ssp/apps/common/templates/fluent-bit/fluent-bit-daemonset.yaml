@@ -27,9 +27,14 @@ spec:
           export LANGUAGE=$(cat /env-config/language)
           export LOGSTASH_HOST=$(cat /env-config/logstash_host)
           export LOGSTASH_PORT=$(cat /env-config/logstash_port)
+          cp /fluent-bit-config-source/fluent-bit.conf /fluent-bit-config/fluent-bit.conf
+          cp /fluent-bit-config-source/parsers.conf /fluent-bit-config/parsers.conf
           envsubst < /fluent-bit-config/fluent-bit.conf > /fluent-bit-config/fluent-bit.conf.tmp
           mv /fluent-bit-config/fluent-bit.conf.tmp /fluent-bit-config/fluent-bit.conf
         volumeMounts:
+        - name: fluent-bit-config-source
+          mountPath: /fluent-bit-config-source
+          readOnly: true
         - name: fluent-bit-config
           mountPath: /fluent-bit-config
         - name: fluent-bit-env
@@ -59,9 +64,11 @@ spec:
       - name: varlibdockercontainers
         hostPath:
           path: /var/lib/docker/containers
-      - name: fluent-bit-config
+      - name: fluent-bit-config-source
         configMap:
           name: fluent-bit-config
+      - name: fluent-bit-config
+        emptyDir: {}
       - name: fluent-bit-env
         configMap:
           name: fluent-bit-env
