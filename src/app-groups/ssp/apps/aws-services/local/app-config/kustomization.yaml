@@ -10,4 +10,6 @@ configMapGenerator:
     namespace: ssp-local
     literals:
       - SERVER_SSL_ENABLED=false
+      - SPRING_APPLICATION_ENV=LOCAL
       - OIDC_INTROSPECTION_URI=http://ids.ssp-local.svc.cluster.local:4043/connect/introspect
+      - NATIVE_REFLECTION_CONFIGURATION_GENERATOR_ENABLED=false
