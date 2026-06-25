@@ -63,3 +63,15 @@ patches:
       - op: replace
         path: /spec/template/spec/volumes/0/persistentVolumeClaim/claimName
         value: ssp--ids--local--psql--persistent-volume-claim
+
+### Fluent Bit
+
+  - target: { group: "", version: "v1", kind: "ConfigMap", name: "fluent-bit-env" }
+    patch: |-
+      - op: replace
+        path: /data/app_name
+        value: ids
+
+      - op: replace
+        path: /data/language
+        value: csharp
