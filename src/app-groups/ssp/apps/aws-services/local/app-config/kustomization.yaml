@@ -13,3 +13,6 @@ configMapGenerator:
       - SPRING_APPLICATION_ENV=LOCAL
       - OIDC_INTROSPECTION_URI=http://ids.ssp-local.svc.cluster.local:4043/connect/introspect
       - NATIVE_REFLECTION_CONFIGURATION_GENERATOR_ENABLED=false
+      - LOGBACK_LOG_COLORS_ENABLED=false
+      - LOGBACK_LOGSTASH_ENABLED=false
+      - LOGBACK_LOGSTASH_FULL_HOST=

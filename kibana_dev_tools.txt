@@ -1,0 +1,80 @@
+
+PUT elastalert
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  },
+  "mappings": {
+    "properties": {
+      "@timestamp":      { "type": "date" },
+      "rule_name":       { "type": "keyword" },
+      "alert_time":      { "type": "date" },
+      "alert_sent":      { "type": "boolean" },
+      "aggregate_id":    { "type": "keyword" },
+      "match_body":      { "type": "object", "enabled": false },
+      "alert_info":      { "type": "object", "enabled": false }
+    }
+  }
+}
+PUT elastalert_status
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  },
+  "mappings": {
+    "properties": {
+      "@timestamp":      { "type": "date" },
+      "rule_name":       { "type": "keyword" },
+      "alert_time":      { "type": "date" },
+      "alert_sent":      { "type": "boolean" },
+      "aggregate_id":    { "type": "keyword" },
+      "match_body":      { "type": "object", "enabled": false },
+      "alert_info":      { "type": "object", "enabled": false }
+    }
+  }
+}
+PUT elastalert_error
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  },
+  "mappings": {
+    "properties": {
+      "@timestamp": { "type": "date" },
+      "rule_name":  { "type": "keyword" },
+      "traceback":  { "type": "text" }
+    }
+  }
+}
+PUT elastalert_alert
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  },
+  "mappings": {
+    "properties": {
+      "@timestamp": { "type": "date" },
+      "rule_name":  { "type": "keyword" },
+      "alert_time": { "type": "date" },
+      "alert_text": { "type": "text" }
+    }
+  }
+}
+PUT elastalert_healthcheck
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  },
+  "mappings": {
+    "properties": {
+      "@timestamp": {
+        "type": "date"
+      }
+    }
+  }
+}
