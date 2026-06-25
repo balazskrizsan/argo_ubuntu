@@ -16,7 +16,7 @@ data:
       if ![env] {
         mutate { add_field => { "env" => "unknown" } }
       }
-      if [env] in ["dev", "local_prod", "uat", "prod"] {
+      if [env] in ["dev", "local", "local_prod", "uat", "prod"] {
         mutate { add_field => { "target_index" => "ssp-%{env}-logs-short-term" } }
         if [long_term] == "true" {
           mutate { add_field => { "long_term_target_index" => "ssp-%{env}-logs-long-term" } }
