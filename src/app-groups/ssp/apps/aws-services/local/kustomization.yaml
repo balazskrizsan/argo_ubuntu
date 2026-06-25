@@ -41,7 +41,7 @@ patches:
 
 ### Fluent Bit
 
-  - target: { group: "", version: "v1", kind: "ConfigMap", name: "fluent-bit-config" }
+  - target: { group: "", version: "v1", kind: "ConfigMap", name: "fluent-bit-env" }
     patch: |-
       - op: replace
         path: /data/app_name
