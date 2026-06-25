@@ -5,6 +5,7 @@ namespace: ssp-local
 resources:
   - app-config
   - ../templates
+  - ../templates/fluent-bit
 
 patches:
   - target: { group: "apps", version: "v1", kind: "Deployment", name: "aws-services" }
@@ -40,7 +41,7 @@ patches:
 
 ### Fluent Bit
 
-  - target: { group: "", version: "v1", kind: "ConfigMap", name: "fluent-bit-env" }
+  - target: { group: "", version: "v1", kind: "ConfigMap", name: "fluent-bit-config" }
     patch: |-
       - op: replace
         path: /data/app_name
