@@ -5,7 +5,8 @@ namespace: ssp-local
 resources:
   - app-config
   - ../templates
-  - ../templates/fluent-bit
+  - ../templates/fluent-bit-aws-services-a
+  - ../templates/fluent-bit-aws-services-b
   - ../../common/insecure-config
 
 patches:
