@@ -34,15 +34,15 @@ spec:
           echo "LOGSTASH_HOST: $LOGSTASH_HOST"
           echo "LOGSTASH_PORT: $LOGSTASH_PORT"
 
-          cp /fluent-bit-config-source/fluent-bit.conf /fluent-bit-config/fluent-bit.conf
-          cp /fluent-bit-config-source/parsers.conf /fluent-bit-config/parsers.conf
+          cp /fluent-bit-config-b-source/fluent-bit.conf /fluent-bit-config/fluent-bit.conf
+          cp /fluent-bit-config-b-source/parsers.conf /fluent-bit-config/parsers.conf
           envsubst < /fluent-bit-config/fluent-bit.conf > /fluent-bit-config/fluent-bit.conf.tmp
           mv /fluent-bit-config/fluent-bit.conf.tmp /fluent-bit-config/fluent-bit.conf
         volumeMounts:
-        - name: fluent-bit-config-source
-          mountPath: /fluent-bit-config-source
+        - name: fluent-bit-config-b-source
+          mountPath: /fluent-bit-config-b-source
           readOnly: true
-        - name: fluent-bit-config
+        - name: fluent-bit-config-b
           mountPath: /fluent-bit-config
         - name: fluent-bit-env
           mountPath: /env-config
@@ -71,7 +71,7 @@ spec:
       - name: varlibdockercontainers
         hostPath:
           path: /var/lib/docker/containers
-      - name: fluent-bit-config-source
+      - name: fluent-bit-config-b-source
         configMap:
           name: fluent-bit-config-b
       - name: fluent-bit-config-b
