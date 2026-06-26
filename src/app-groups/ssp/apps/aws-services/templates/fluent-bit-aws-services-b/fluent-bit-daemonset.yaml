@@ -44,7 +44,7 @@ spec:
           readOnly: true
         - name: fluent-bit-config-b
           mountPath: /fluent-bit-config
-        - name: fluent-bit-env
+        - name: fluent-bit-env-b
           mountPath: /env-config
       containers:
       - name: fluent-bit-b
