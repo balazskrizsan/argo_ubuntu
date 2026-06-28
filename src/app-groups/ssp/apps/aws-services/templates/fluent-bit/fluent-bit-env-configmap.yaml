@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: fluent-bit-env-a
+  name: fluent-bit-env
 data:
   env: local
   logstash_host: logstash.elk-local.svc.cluster.local
   logstash_port: "5044"
-  app_name: placeholder
-  language: placeholder
+  app_name: aws-services
+  language: java

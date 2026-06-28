@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: fluent-bit-a
+  name: fluent-bit-aws-services
   labels:
-    app: fluent-bit-a
+    app: fluent-bit-aws-services
 spec:
   selector:
     matchLabels:
-      app: fluent-bit-a
+      app: fluent-bit-aws-services
   template:
     metadata:
       labels:
-        app: fluent-bit-a
+        app: fluent-bit-aws-services
     spec:
-      serviceAccountName: fluent-bit-a
+      serviceAccountName: fluent-bit-aws-services
       initContainers:
       - name: config-subst
         image: alpine:3.18
@@ -42,12 +42,12 @@ spec:
         - name: fluent-bit-config-source
           mountPath: /fluent-bit-config-source
           readOnly: true
-        - name: fluent-bit-config-a
+        - name: fluent-bit-config
           mountPath: /fluent-bit-config
-        - name: fluent-bit-env-a
+        - name: fluent-bit-env
           mountPath: /env-config
       containers:
-      - name: fluent-bit-a
+      - name: fluent-bit-aws-services
         image: fluent/fluent-bit:2.2.0
         imagePullPolicy: Always
         volumeMounts:
@@ -56,7 +56,7 @@ spec:
         - name: varlibdockercontainers
           mountPath: /var/lib/docker/containers
           readOnly: true
-        - name: fluent-bit-config-a
+        - name: fluent-bit-config
           mountPath: /fluent-bit/etc/
         resources:
           limits:
@@ -73,9 +73,9 @@ spec:
           path: /var/lib/docker/containers
       - name: fluent-bit-config-source
         configMap:
-          name: fluent-bit-config-a
-      - name: fluent-bit-config-a
+          name: fluent-bit-config
+      - name: fluent-bit-config
         emptyDir: {}
-      - name: fluent-bit-env-a
+      - name: fluent-bit-env
         configMap:
-          name: fluent-bit-env-a
+          name: fluent-bit-env
