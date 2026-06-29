@@ -77,7 +77,7 @@ spec:
           path: /var/lib/docker/containers
       - name: fluent-bit-config-source
         configMap:
-          name: fluent-bit-config
+          name: fluent-bit-config-aws-services
       - name: fluent-bit-config
         emptyDir: {}
       - name: fluent-bit-env
