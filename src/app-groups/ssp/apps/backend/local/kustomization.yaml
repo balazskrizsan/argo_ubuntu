@@ -6,6 +6,7 @@ resources:
   - app-config
   - ../templates
   - ../templates/fluent-bit
+  - ../../common/templates/fluent-bit
 
 patches:
   - target: { group: "apps", version: "v1", kind: "Deployment", name: "backend" }
