@@ -43,7 +43,7 @@ patches:
 
 ### Fluent Bit
 
-  - target: { group: "", version: "v1", kind: "ConfigMap", name: "fluent-bit-env" }
+  - target: { group: "", version: "v1", kind: "ConfigMap", name: "fluent-bit-env-aws-services" }
     patch: |-
       - op: replace
         path: /data/app_name

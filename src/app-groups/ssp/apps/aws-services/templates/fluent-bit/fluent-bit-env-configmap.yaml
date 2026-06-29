@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: fluent-bit-env
+  name: fluent-bit-env-aws-services
 data:
   env: local
   logstash_host: logstash.elk-local.svc.cluster.local
