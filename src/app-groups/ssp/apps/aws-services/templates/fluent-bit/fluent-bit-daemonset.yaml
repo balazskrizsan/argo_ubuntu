@@ -41,7 +41,7 @@ spec:
           echo "====================="
           cat /fluent-bit-config/fluent-bit.conf
           echo "====================="
-          eco "/fluent-bit-config/parsers.conf:"
+          echo "/fluent-bit-config/parsers.conf:"
           echo "====================="
           cat /fluent-bit-config/parsers.conf
           echo "====================="
