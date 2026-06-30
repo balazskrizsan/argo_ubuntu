@@ -32,6 +32,15 @@ spec:
           echo "LANGUAGE: $LANGUAGE"
           echo "LOGSTASH_HOST: $LOGSTASH_HOST"
           echo "LOGSTASH_PORT: $LOGSTASH_PORT"
+          
+          echo "/fluent-bit-config/fluent-bit.conf:"
+          echo "====================="
+          cat /fluent-bit-config/fluent-bit.conf
+          echo "====================="
+          eco "/fluent-bit-config/parsers.conf:"
+          echo "====================="
+          cat /fluent-bit-config/parsers.conf
+          echo "====================="
 
           cp /fluent-bit-config-source/fluent-bit.conf /fluent-bit-config/fluent-bit.conf
           cp /fluent-bit-config-source/parsers.conf /fluent-bit-config/parsers.conf
