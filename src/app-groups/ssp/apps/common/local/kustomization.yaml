@@ -5,4 +5,5 @@ namespace: ssp-local
 resources:
   - ../insecure-config
   - ../cert-manager
+  - ../secret-manager
   - ../fluent-bit
