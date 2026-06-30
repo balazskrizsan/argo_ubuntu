@@ -5,5 +5,5 @@ resources:
   - ingress.yaml
   - deployment.yaml
   - service.yaml
-  - psql-deployment.yaml
-  - psql-service.yaml
+  - psql/deployment.yaml
+  - psql/service.yaml
