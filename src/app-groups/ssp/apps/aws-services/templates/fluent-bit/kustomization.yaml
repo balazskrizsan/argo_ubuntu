@@ -6,4 +6,4 @@ resources:
   - rbac.yaml
   - fluent-bit-daemonset.yaml
   - fluent-bit-env-configmap.yaml
-  - ../../../common/templates/fluent-bit
+  - ../../../common/fluent-bit
