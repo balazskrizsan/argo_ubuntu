@@ -5,4 +5,3 @@ resources:
   - serviceaccount.yaml
   - fluent-bit-daemonset.yaml
   - fluent-bit-env-configmap.yaml
-  - ../../../common/fluent-bit
