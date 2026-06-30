@@ -3,6 +3,6 @@ kind: Kustomization
 
 resources:
   - serviceaccount.yaml
-  - rbac.yaml
   - fluent-bit-daemonset.yaml
   - fluent-bit-env-configmap.yaml
+  - ../../../common/fluent-bit

@@ -3,3 +3,4 @@ kind: Kustomization
 
 resources:
   - fluent-bit-filebased-configmap.yaml
+  - rbac.yaml
