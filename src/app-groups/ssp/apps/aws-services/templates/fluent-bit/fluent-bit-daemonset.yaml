@@ -33,6 +33,10 @@ spec:
           echo "LOGSTASH_HOST: $LOGSTASH_HOST"
           echo "LOGSTASH_PORT: $LOGSTASH_PORT"
           
+          
+          cp /fluent-bit-config-source/fluent-bit.conf /fluent-bit-config/fluent-bit.conf
+          cp /fluent-bit-config-source/parsers.conf /fluent-bit-config/parsers.conf
+
           echo "/fluent-bit-config/fluent-bit.conf:"
           echo "====================="
           cat /fluent-bit-config/fluent-bit.conf
@@ -42,8 +46,6 @@ spec:
           cat /fluent-bit-config/parsers.conf
           echo "====================="
 
-          cp /fluent-bit-config-source/fluent-bit.conf /fluent-bit-config/fluent-bit.conf
-          cp /fluent-bit-config-source/parsers.conf /fluent-bit-config/parsers.conf
           sed -e "s/@APP_NAME@/$APP_NAME/g" \
               -e "s/@ENV@/$ENV/g" \
               -e "s/@LANGUAGE@/$LANGUAGE/g" \
