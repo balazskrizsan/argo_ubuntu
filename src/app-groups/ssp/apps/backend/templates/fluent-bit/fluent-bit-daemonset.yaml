@@ -13,7 +13,6 @@ spec:
       labels:
         app: fluent-bit-backend
     spec:
-      serviceAccountName: fluent-bit-backend
       initContainers:
       - name: config-subst
         image: alpine:3.18

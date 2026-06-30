@@ -13,7 +13,6 @@ spec:
       labels:
         app: fluent-bit-aws-services
     spec:
-      serviceAccountName: fluent-bit-aws-services
       initContainers:
       - name: config-subst
         image: alpine:3.18
