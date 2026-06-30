@@ -34,16 +34,16 @@ spec:
           echo "LOGSTASH_PORT: $LOGSTASH_PORT"
           
           
-          cp /fluent-bit-config-source/fluent-bit.conf /fluent-bit-config/fluent-bit.conf
-          cp /fluent-bit-config-source/parsers.conf /fluent-bit-config/parsers.conf
+          cp /fluent-bit-filebased-configmap-source/fluent-bit.conf /fluent-bit-filebased-configmap/fluent-bit.conf
+          cp /fluent-bit-filebased-configmap-source/parsers.conf /fluent-bit-filebased-configmap/parsers.conf
 
-          echo "/fluent-bit-config/fluent-bit.conf:"
+          echo "/fluent-bit-filebased-configmap/fluent-bit.conf:"
           echo "====================="
-          cat /fluent-bit-config/fluent-bit.conf
+          cat /fluent-bit-filebased-configmap/fluent-bit.conf
           echo "====================="
-          echo "/fluent-bit-config/parsers.conf:"
+          echo "/fluent-bit-filebased-configmap/parsers.conf:"
           echo "====================="
-          cat /fluent-bit-config/parsers.conf
+          cat /fluent-bit-filebased-configmap/parsers.conf
           echo "====================="
 
           sed -e "s/@APP_NAME@/$APP_NAME/g" \
@@ -51,14 +51,14 @@ spec:
               -e "s/@LANGUAGE@/$LANGUAGE/g" \
               -e "s/@LOGSTASH_HOST@/$LOGSTASH_HOST/g" \
               -e "s/@LOGSTASH_PORT@/$LOGSTASH_PORT/g" \
-              /fluent-bit-config/fluent-bit.conf > /fluent-bit-config/fluent-bit.conf.tmp
-          mv /fluent-bit-config/fluent-bit.conf.tmp /fluent-bit-config/fluent-bit.conf
+              /fluent-bit-filebased-configmap/fluent-bit.conf > /fluent-bit-filebased-configmap/fluent-bit.conf.tmp
+          mv /fluent-bit-filebased-configmap/fluent-bit.conf.tmp /fluent-bit-filebased-configmap/fluent-bit.conf
         volumeMounts:
-        - name: fluent-bit-config-source
-          mountPath: /fluent-bit-config-source
+        - name: fluent-bit-filebased-configmap-source
+          mountPath: /fluent-bit-filebased-configmap-source
           readOnly: true
-        - name: fluent-bit-config
-          mountPath: /fluent-bit-config
+        - name: fluent-bit-filebased-configmap
+          mountPath: /fluent-bit-filebased-configmap
         - name: fluent-bit-env
           mountPath: /env-config
       containers:
@@ -71,7 +71,7 @@ spec:
         - name: varlibdockercontainers
           mountPath: /var/lib/docker/containers
           readOnly: true
-        - name: fluent-bit-config
+        - name: fluent-bit-filebased-configmap
           mountPath: /fluent-bit/etc/
         resources:
           limits:
@@ -86,10 +86,10 @@ spec:
       - name: varlibdockercontainers
         hostPath:
           path: /var/lib/docker/containers
-      - name: fluent-bit-config-source
+      - name: fluent-bit-filebased-configmap-source
         configMap:
-          name: fluent-bit-config
-      - name: fluent-bit-config
+          name: fluent-bit-filebased-configmap
+      - name: fluent-bit-filebased-configmap
         emptyDir: {}
       - name: fluent-bit-env
         configMap:
