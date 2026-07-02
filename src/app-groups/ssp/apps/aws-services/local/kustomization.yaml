@@ -12,7 +12,7 @@ patches:
     patch: |-
       - op: replace
         path: /spec/template/spec/containers/0/image
-        value: kbalazsworks/smart_scrum_poker_v2_aws_services:commit_sha_short_960edac
+        value: kbalazsworks/smart_scrum_poker_v2_aws_services:commit_sha_short_33bec00
 
   - target: { group: "", version: "v1", kind: "Service", name: "aws-services" }
     patch: |-
