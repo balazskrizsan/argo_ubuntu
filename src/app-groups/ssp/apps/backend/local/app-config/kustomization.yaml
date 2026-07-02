@@ -28,6 +28,6 @@ configMapGenerator:
       - SPRING_DATASOURCE_PASSWORD=admin_pass
       - SPRING_DATASOURCE_URL=jdbc:postgresql://backend-psql-service:4013/app_db
       - SPRING_DATASOURCE_USERNAME=admin
-      - LOGBACK_LOG_TYPE=COLOR_TEXT
+      - LOGBACK_LOG_TYPE=JSON
       - LOGBACK_LOGSTASH_ENABLED=false
       - LOGBACK_LOGSTASH_FULL_HOST=
