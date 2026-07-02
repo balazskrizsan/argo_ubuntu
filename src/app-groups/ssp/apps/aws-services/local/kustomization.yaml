@@ -46,7 +46,3 @@ patches:
       - op: replace
         path: /data/app_name
         value: aws-services
-
-      - op: replace
-        path: /data/language
-        value: java

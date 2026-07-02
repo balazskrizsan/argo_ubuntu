@@ -12,7 +12,7 @@ patches:
     patch: |-
       - op: replace
         path: /spec/template/spec/containers/0/image
-        value: kbalazsworks/smart_scrum_poker_v2_backend:commit_sha_short_2b5b373
+        value: kbalazsworks/smart_scrum_poker_v2_backend:commit_sha_short_ffe1589
 
   - target: { group: "", version: "v1", kind: "Service", name: "backend" }
     patch: |-
@@ -70,7 +70,3 @@ patches:
       - op: replace
         path: /data/app_name
         value: backend
-
-      - op: replace
-        path: /data/language
-        value: java

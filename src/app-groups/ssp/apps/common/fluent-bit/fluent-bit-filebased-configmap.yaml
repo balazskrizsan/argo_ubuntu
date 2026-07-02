@@ -37,7 +37,6 @@ data:
         Match               @APP_NAME@.*
         Add                 env @ENV@
         Add                 app_name @APP_NAME@
-        Add                 language @LANGUAGE@
 
     [OUTPUT]
         Name            tcp

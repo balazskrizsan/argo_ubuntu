@@ -22,13 +22,11 @@ spec:
         - |
           export APP_NAME=$(cat /env-config/app_name)
           export ENV=$(cat /env-config/env)
-          export LANGUAGE=$(cat /env-config/language)
           export LOGSTASH_HOST=$(cat /env-config/logstash_host)
           export LOGSTASH_PORT=$(cat /env-config/logstash_port)
 
           echo "APP_NAME: $APP_NAME"
           echo "ENV: $ENV"
-          echo "LANGUAGE: $LANGUAGE"
           echo "LOGSTASH_HOST: $LOGSTASH_HOST"
           echo "LOGSTASH_PORT: $LOGSTASH_PORT"
 
@@ -36,7 +34,6 @@ spec:
           cp /fluent-bit-filebased-configmap-source/parsers.conf /fluent-bit-filebased-configmap/parsers.conf
           sed -e "s/@APP_NAME@/$APP_NAME/g" \
               -e "s/@ENV@/$ENV/g" \
-              -e "s/@LANGUAGE@/$LANGUAGE/g" \
               -e "s/@LOGSTASH_HOST@/$LOGSTASH_HOST/g" \
               -e "s/@LOGSTASH_PORT@/$LOGSTASH_PORT/g" \
               /fluent-bit-filebased-configmap/fluent-bit.conf > /fluent-bit-filebased-configmap/fluent-bit.conf.tmp

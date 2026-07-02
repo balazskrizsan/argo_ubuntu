@@ -7,4 +7,3 @@ data:
   logstash_host: logstash.elk-local.svc.cluster.local
   logstash_port: "5044"
   app_name: aws-services
-  language: java

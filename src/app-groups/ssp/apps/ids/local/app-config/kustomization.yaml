@@ -24,3 +24,8 @@ configMapGenerator:
       - IdentityServer__IssuerUri=https://ids--smartscrumpoker.localhost.balazskrizsan.com
       - IdentityServer__Port=8080
       - IdentityServer_ForceHttpsRewrite=true
+      - Logging__AppName=ssp_identity_service
+      - Logging__LogstashEnabled=false
+      - Logging__LogstashHost=
+      - Logging__LogstashPort=
+      - Logging__LogType=COLOR_TEXT
