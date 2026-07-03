@@ -26,6 +26,6 @@ configMapGenerator:
       - IdentityServer_ForceHttpsRewrite=true
       - Logging__AppName=ssp_identity_service
       - Logging__LogstashEnabled=false
-      - Logging__LogstashHost=disbled
+      - Logging__LogstashHost=disabled
       - Logging__LogstashPort=1111
       - Logging__LogType=COLOR_TEXT
