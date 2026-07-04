@@ -20,12 +20,10 @@ spec:
         - /bin/sh
         - -c
         - |
-          export APP_NAMES=$(cat /env-config/app_names)
           export ENV=$(cat /env-config/env)
           export LOGSTASH_HOST=$(cat /env-config/logstash_host)
           export LOGSTASH_PORT=$(cat /env-config/logstash_port)
 
-          echo "APP_NAMES: $APP_NAMES"
           echo "ENV: $ENV"
           echo "LOGSTASH_HOST: $LOGSTASH_HOST"
           echo "LOGSTASH_PORT: $LOGSTASH_PORT"
@@ -43,12 +41,7 @@ spec:
           cat /fluent-bit-filebased-configmap/parsers.conf
           echo "====================="
 
-          # Convert comma-separated app names to pipe-separated regex
-          APP_NAMES_REGEX=$(echo $APP_NAMES | sed 's/,/|/g')
-          echo "APP_NAMES_REGEX: $APP_NAMES_REGEX"
-
-          sed -e "s/@APP_NAMES_REGEX@/$APP_NAMES_REGEX/g" \
-              -e "s/@ENV@/$ENV/g" \
+          sed -e "s/@ENV@/$ENV/g" \
               -e "s/@LOGSTASH_HOST@/$LOGSTASH_HOST/g" \
               -e "s/@LOGSTASH_PORT@/$LOGSTASH_PORT/g" \
               /fluent-bit-filebased-configmap/fluent-bit.conf > /fluent-bit-filebased-configmap/fluent-bit.conf.tmp

@@ -33,11 +33,6 @@ data:
         K8S-Logging.Exclude On
 
     [FILTER]
-        Name                grep
-        Match               kube.*
-        Regex              kubernetes.pod_name (@APP_NAMES_REGEX@)
-
-    [FILTER]
         Name                modify
         Match               kube.*
         Add                 env @ENV@
