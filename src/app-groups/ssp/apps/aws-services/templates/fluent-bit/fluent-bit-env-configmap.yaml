@@ -6,4 +6,4 @@ data:
   env: local
   logstash_host: logstash.elk-local.svc.cluster.local
   logstash_port: "5044"
-  app_names: "aws-services,backend"
+  app_names: "aws-services"
