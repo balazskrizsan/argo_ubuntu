@@ -13,6 +13,44 @@ data:
 
     filter {
       mutate { lowercase => ["env"] }
+      if ![app] {
+        mutate { add_field => { "app" => "unknown" } }
+      }
+      if ![message] and [log] {
+        mutate { rename => { "log" => "message" } }
+      }
+      if ![level] and [message] {
+        grok {
+          match => { "message" => "\[([A-Za-z\s]+)\]" }
+          overwrite => ["level"]
+        }
+        if [level] {
+          mutate {
+            strip => ["level"]
+            uppercase => ["level"]
+          }
+        } else {
+          if [message] =~ /(?i)error/ {
+            mutate { add_field => { "level" => "ERROR" } }
+            mutate { add_field => { "level_value" => 40000 } }
+          } else if [message] =~ /(?i)warn/ {
+            mutate { add_field => { "level" => "WARN" } }
+            mutate { add_field => { "level_value" => 30000 } }
+          } else if [message] =~ /(?i)info/ {
+            mutate { add_field => { "level" => "INFO" } }
+            mutate { add_field => { "level_value" => 20000 } }
+          } else if [message] =~ /(?i)debug/ {
+            mutate { add_field => { "level" => "DEBUG" } }
+            mutate { add_field => { "level_value" => 10000 } }
+          } else if [message] =~ /(?i)trace/ {
+            mutate { add_field => { "level" => "TRACE" } }
+            mutate { add_field => { "level_value" => 5000 } }
+          } else if [message] =~ /(?i)fatal/ {
+            mutate { add_field => { "level" => "FATAL" } }
+            mutate { add_field => { "level_value" => 50000 } }
+          }
+        }
+      }
       if ![env] {
         mutate { add_field => { "env" => "unknown" } }
       }
