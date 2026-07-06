@@ -36,6 +36,7 @@ data:
         Name                grep
         Match               kube.*
         Regex               kubernetes.pod_name  ^aws-services
+        Exclude             kubernetes.pod_name  fluent-bit
 
     [FILTER]
         Name                modify
