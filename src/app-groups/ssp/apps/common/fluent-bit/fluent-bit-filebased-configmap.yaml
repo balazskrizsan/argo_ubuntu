@@ -12,7 +12,7 @@ data:
 
     [INPUT]
         Name              tail
-        Path              /var/log/containers/*.log
+        Path              /var/log/containers/aws-services-*.log
         Parser            docker
         Tag               kube.*
         Mem_Buf_Limit     5MB
@@ -35,7 +35,6 @@ data:
     [FILTER]
         Name                grep
         Match               kube.*
-        Regex               kubernetes.pod_name  ^aws-services
         Exclude             kubernetes.pod_name  fluent-bit
 
     [FILTER]
