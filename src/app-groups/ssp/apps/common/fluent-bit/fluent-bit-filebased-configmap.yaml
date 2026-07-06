@@ -12,7 +12,7 @@ data:
 
     [INPUT]
         Name              tail
-        Path              /var/log/containers/*.log
+        Path              /var/log/containers/*_aws-services-*.log
         Parser            docker
         Tag               kube.*
         Mem_Buf_Limit     5MB
