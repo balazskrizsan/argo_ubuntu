@@ -48,6 +48,9 @@ data:
           } else if [message] =~ /(?i)fatal/ {
             mutate { add_field => { "level" => "FATAL" } }
             mutate { add_field => { "level_value" => 50000 } }
+          } else {
+            mutate { add_field => { "level" => "INFO" } }
+            mutate { add_field => { "level_value" => 20000 } }
           }
         }
       }
