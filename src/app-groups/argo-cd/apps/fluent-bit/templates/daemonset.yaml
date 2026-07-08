@@ -30,29 +30,29 @@ spec:
           echo "LOGSTASH_PORT: $LOGSTASH_PORT"
           
           
-          cp /fluent-bit-filebased-configmap-source/fluent-bit.conf /fluent-bit-filebased-configmap/fluent-bit.conf
-          cp /fluent-bit-filebased-configmap-source/parsers.conf /fluent-bit-filebased-configmap/parsers.conf
+          cp /argo-cd-fluent-bit-filebased-configmap-source/fluent-bit.conf /argo-cd-fluent-bit-filebased-configmap/fluent-bit.conf
+          cp /argo-cd-fluent-bit-filebased-configmap-source/parsers.conf /argo-cd-fluent-bit-filebased-configmap/parsers.conf
 
-          echo "/fluent-bit-filebased-configmap/fluent-bit.conf:"
+          echo "/argo-cd-fluent-bit-filebased-configmap/fluent-bit.conf:"
           echo "====================="
-          cat /fluent-bit-filebased-configmap/fluent-bit.conf
+          cat /argo-cd-fluent-bit-filebased-configmap/fluent-bit.conf
           echo "====================="
-          echo "/fluent-bit-filebased-configmap/parsers.conf:"
+          echo "/argo-cd-fluent-bit-filebased-configmap/parsers.conf:"
           echo "====================="
-          cat /fluent-bit-filebased-configmap/parsers.conf
+          cat /argo-cd-fluent-bit-filebased-configmap/parsers.conf
           echo "====================="
 
           sed -e "s/@ENV@/$ENV/g" \
               -e "s/@LOGSTASH_HOST@/$LOGSTASH_HOST/g" \
               -e "s/@LOGSTASH_PORT@/$LOGSTASH_PORT/g" \
-              /fluent-bit-filebased-configmap/fluent-bit.conf > /fluent-bit-filebased-configmap/fluent-bit.conf.tmp
-          mv /fluent-bit-filebased-configmap/fluent-bit.conf.tmp /fluent-bit-filebased-configmap/fluent-bit.conf
+              /argo-cd-fluent-bit-filebased-configmap/fluent-bit.conf > /argo-cd-fluent-bit-filebased-configmap/fluent-bit.conf.tmp
+          mv /argo-cd-fluent-bit-filebased-configmap/fluent-bit.conf.tmp /argo-cd-fluent-bit-filebased-configmap/fluent-bit.conf
         volumeMounts:
-        - name: fluent-bit-filebased-configmap-source
-          mountPath: /fluent-bit-filebased-configmap-source
+        - name: argo-cd-fluent-bit-filebased-configmap-source
+          mountPath: /argo-cd-fluent-bit-filebased-configmap-source
           readOnly: true
-        - name: fluent-bit-filebased-configmap
-          mountPath: /fluent-bit-filebased-configmap
+        - name: argo-cd-fluent-bit-filebased-configmap
+          mountPath: /argo-cd-fluent-bit-filebased-configmap
         - name: fluent-bit-env
           mountPath: /env-config
       containers:
@@ -65,7 +65,7 @@ spec:
         - name: varlibdockercontainers
           mountPath: /var/lib/docker/containers
           readOnly: true
-        - name: fluent-bit-filebased-configmap
+        - name: argo-cd-fluent-bit-filebased-configmap
           mountPath: /fluent-bit/etc/
         resources:
           limits:
@@ -80,10 +80,10 @@ spec:
       - name: varlibdockercontainers
         hostPath:
           path: /var/lib/docker/containers
-      - name: fluent-bit-filebased-configmap-source
+      - name: argo-cd-fluent-bit-filebased-configmap-source
         configMap:
-          name: fluent-bit-filebased-configmap
-      - name: fluent-bit-filebased-configmap
+          name: argo-cd-fluent-bit-filebased-configmap
+      - name: argo-cd-fluent-bit-filebased-configmap
         emptyDir: {}
       - name: fluent-bit-env
         configMap:
