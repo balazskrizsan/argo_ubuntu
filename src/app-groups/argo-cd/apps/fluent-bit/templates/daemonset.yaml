@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: fluent-bit
+  name: argo-cd-fluent-bit
   labels:
-    app: fluent-bit
+    app: argo-cd-fluent-bit
 spec:
   selector:
     matchLabels:
-      app: fluent-bit
+      app: argo-cd-fluent-bit
   template:
     metadata:
       labels:
-        app: fluent-bit
+        app: argo-cd-fluent-bit
     spec:
-      serviceAccountName: fluent-bit
+      serviceAccountName: argo-cd-fluent-bit
       initContainers:
       - name: config-subst
         image: alpine:3.18
@@ -30,33 +30,33 @@ spec:
           echo "LOGSTASH_PORT: $LOGSTASH_PORT"
           
           
-          cp /argo-cd-fluent-bit-filebased-configmap-source/fluent-bit.conf /argo-cd-fluent-bit-filebased-configmap/fluent-bit.conf
-          cp /argo-cd-fluent-bit-filebased-configmap-source/parsers.conf /argo-cd-fluent-bit-filebased-configmap/parsers.conf
+          cp /fluent-bit-configmap-source/fluent-bit.conf /fluent-bit-configmap/fluent-bit.conf
+          cp /fluent-bit-configmap-source/parsers.conf /fluent-bit-configmap/parsers.conf
 
-          echo "/argo-cd-fluent-bit-filebased-configmap/fluent-bit.conf:"
+          echo "/fluent-bit-configmap/fluent-bit.conf:"
           echo "====================="
-          cat /argo-cd-fluent-bit-filebased-configmap/fluent-bit.conf
+          cat /fluent-bit-configmap/fluent-bit.conf
           echo "====================="
-          echo "/argo-cd-fluent-bit-filebased-configmap/parsers.conf:"
+          echo "/fluent-bit-configmap/parsers.conf:"
           echo "====================="
-          cat /argo-cd-fluent-bit-filebased-configmap/parsers.conf
+          cat /fluent-bit-configmap/parsers.conf
           echo "====================="
 
           sed -e "s/@ENV@/$ENV/g" \
               -e "s/@LOGSTASH_HOST@/$LOGSTASH_HOST/g" \
               -e "s/@LOGSTASH_PORT@/$LOGSTASH_PORT/g" \
-              /argo-cd-fluent-bit-filebased-configmap/fluent-bit.conf > /argo-cd-fluent-bit-filebased-configmap/fluent-bit.conf.tmp
-          mv /argo-cd-fluent-bit-filebased-configmap/fluent-bit.conf.tmp /argo-cd-fluent-bit-filebased-configmap/fluent-bit.conf
+              /fluent-bit-configmap/fluent-bit.conf > /fluent-bit-configmap/fluent-bit.conf.tmp
+          mv /fluent-bit-configmap/fluent-bit.conf.tmp /fluent-bit-configmap/fluent-bit.conf
         volumeMounts:
-        - name: argo-cd-fluent-bit-filebased-configmap-source
-          mountPath: /argo-cd-fluent-bit-filebased-configmap-source
+        - name: fluent-bit-configmap-source
+          mountPath: /fluent-bit-configmap-source
           readOnly: true
-        - name: argo-cd-fluent-bit-filebased-configmap
-          mountPath: /argo-cd-fluent-bit-filebased-configmap
+        - name: fluent-bit-configmap
+          mountPath: /fluent-bit-configmap
         - name: fluent-bit-env
           mountPath: /env-config
       containers:
-      - name: fluent-bit
+      - name: argo-cd-fluent-bit
         image: fluent/fluent-bit:2.2.0
         imagePullPolicy: Always
         volumeMounts:
@@ -65,7 +65,7 @@ spec:
         - name: varlibdockercontainers
           mountPath: /var/lib/docker/containers
           readOnly: true
-        - name: argo-cd-fluent-bit-filebased-configmap
+        - name: fluent-bit-configmap
           mountPath: /fluent-bit/etc/
         resources:
           limits:
@@ -80,11 +80,11 @@ spec:
       - name: varlibdockercontainers
         hostPath:
           path: /var/lib/docker/containers
-      - name: argo-cd-fluent-bit-filebased-configmap-source
+      - name: fluent-bit-configmap-source
         configMap:
-          name: argo-cd-fluent-bit-filebased-configmap
-      - name: argo-cd-fluent-bit-filebased-configmap
+          name: argo-cd-fluent-bit-configmap
+      - name: fluent-bit-configmap
         emptyDir: {}
       - name: fluent-bit-env
         configMap:
-          name: fluent-bit-env
+          name: argo-cd-fluent-bit-env

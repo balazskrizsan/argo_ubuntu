@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: fluent-bit
+  name: argo-cd-fluent-bit
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: fluent-bit
+  name: argo-cd-fluent-bit
 rules:
 - apiGroups: [""]
   resources: ["pods"]
@@ -15,12 +15,12 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: fluent-bit
+  name: argo-cd-fluent-bit
 subjects:
 - kind: ServiceAccount
-  name: fluent-bit
+  name: argo-cd-fluent-bit
   namespace: argocd
 roleRef:
   kind: ClusterRole
-  name: fluent-bit
+  name: argo-cd-fluent-bit
   apiGroup: rbac.authorization.k8s.io

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: argo-cd-argo-cd-fluent-bit-filebased-configmap
+  name: argo-cd-fluent-bit-configmap
 data:
   fluent-bit.conf: |
     [SERVICE]
