@@ -5,3 +5,4 @@
 ./set-cluster-config.sh
 #./start-argo-apps.sh
 ./start-argo-app.sh ssp
+
