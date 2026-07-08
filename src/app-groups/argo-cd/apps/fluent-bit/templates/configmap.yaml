@@ -6,13 +6,13 @@ data:
   fluent-bit.conf: |
     [SERVICE]
         Flush         1
-        Log_Level     info
+        Log_Level     debug
         Daemon        off
         Parsers_File  parsers.conf
 
     [INPUT]
         Name              tail
-        Path              /var/log/containers/aws-services-*.log,/var/log/containers/backend-*.log,/var/log/containers/ids-*.log
+        Path              /var/log/containers/argocd-*.log
         Parser            docker
         Tag               kube.*
         Mem_Buf_Limit     5MB
@@ -41,6 +41,7 @@ data:
         Name                modify
         Match               kube.*
         Add                 env @ENV@
+        Add                 app @APP@
 
     [OUTPUT]
         Name            tcp
