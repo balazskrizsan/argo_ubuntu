@@ -22,10 +22,12 @@ spec:
         - -c
         - |
           export ENV=$(cat /env-config/env)
+          export APP=$(cat /env-config/app)
           export LOGSTASH_HOST=$(cat /env-config/logstash_host)
           export LOGSTASH_PORT=$(cat /env-config/logstash_port)
 
           echo "ENV: $ENV"
+          echo "APP: $APP"
           echo "LOGSTASH_HOST: $LOGSTASH_HOST"
           echo "LOGSTASH_PORT: $LOGSTASH_PORT"
           
@@ -43,6 +45,7 @@ spec:
           echo "====================="
 
           sed -e "s/@ENV@/$ENV/g" \
+              -e "s/@APP@/$APP/g" \
               -e "s/@LOGSTASH_HOST@/$LOGSTASH_HOST/g" \
               -e "s/@LOGSTASH_PORT@/$LOGSTASH_PORT/g" \
               /fluent-bit-configmap/fluent-bit.conf > /fluent-bit-configmap/fluent-bit.conf.tmp
