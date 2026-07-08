@@ -1,18 +1,19 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: fluent-bit-aws-services
+  name: fluent-bit
   labels:
-    app: fluent-bit-aws-services
+    app: fluent-bit
 spec:
   selector:
     matchLabels:
-      app: fluent-bit-aws-services
+      app: fluent-bit
   template:
     metadata:
       labels:
-        app: fluent-bit-aws-services
+        app: fluent-bit
     spec:
+      serviceAccountName: fluent-bit
       initContainers:
       - name: config-subst
         image: alpine:3.18
@@ -55,7 +56,7 @@ spec:
         - name: fluent-bit-env
           mountPath: /env-config
       containers:
-      - name: fluent-bit-aws-services
+      - name: fluent-bit
         image: fluent/fluent-bit:2.2.0
         imagePullPolicy: Always
         volumeMounts:
@@ -86,4 +87,4 @@ spec:
         emptyDir: {}
       - name: fluent-bit-env
         configMap:
-          name: fluent-bit-env-aws-services
+          name: fluent-bit-env

@@ -1,3 +1,8 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: fluent-bit
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -10,22 +15,10 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: fluent-bit-aws-services
-subjects:
-- kind: ServiceAccount
-  name: fluent-bit-aws-services
-roleRef:
-  kind: Role
   name: fluent-bit
-  apiGroup: rbac.authorization.k8s.io
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: fluent-bit-backend
 subjects:
 - kind: ServiceAccount
-  name: fluent-bit-backend
+  name: fluent-bit
 roleRef:
   kind: Role
   name: fluent-bit

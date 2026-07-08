@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - namespace-config.yaml
   - ../../apps/common/local
+  - ../../apps/fluent-bit/local
   - ../../apps/aws-services/local
   - ../../apps/identity-service/local
   - ../../apps/backend/local
