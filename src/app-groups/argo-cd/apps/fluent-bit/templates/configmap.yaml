@@ -31,6 +31,8 @@ data:
         Keep_Log            On
         K8S-Logging.Parser  On
         K8S-Logging.Exclude On
+        Labels              Off
+        Annotations         Off
 
     [FILTER]
         Name                grep
