@@ -25,10 +25,10 @@ spec:
           resources:
             requests:
               cpu: 400m
-              memory: 400Mi
+              memory: 1Gi
             limits:
               cpu: 800m
-              memory: 800Mi
+              memory: 2Gi
           env:
             - name: spring.profiles.active
               value: native
