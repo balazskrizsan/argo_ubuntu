@@ -29,11 +29,6 @@ spec:
             limits:
               cpu: 400m
               memory: 400Mi
-          envFrom:
-            - configMapRef:
-                name: semantic-log-classifier-config
-            - secretRef:
-                name: semantic-log-classifier-secrets
           env:
             - name: spring.profiles.active
               value: native
