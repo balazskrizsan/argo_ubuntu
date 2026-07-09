@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: semantic-log-classifier-psql-service
+  name: semantic-log-classifier-psql
 spec:
   type: ClusterIP
   ports:
