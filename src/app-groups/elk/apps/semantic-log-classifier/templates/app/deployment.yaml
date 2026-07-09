@@ -29,6 +29,9 @@ spec:
             limits:
               cpu: 800m
               memory: 2Gi
+          envFrom:
+            - configMapRef:
+                name: semantic-log-classifier-config
           env:
             - name: spring.profiles.active
               value: native
