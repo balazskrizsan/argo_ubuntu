@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: ssp-local
+
+resources:
+  - elk--semantic-log-classifier--local--psql--persistent-volume.yaml
+  - elk--semantic-log-classifier--local--psql--persistent-volume-claim.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+  - name: semantic-log-classifier-config
+    namespace: ssp-local
+    literals:
+      - SERVER_ENV=local
+      - SERVER_PORT=4073
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://semantic-log-classifier-psql:4083/app_db
+      - SPRING_FLYWAY_URL=jdbc:postgresql://semantic-log-classifier-psql:4083/app_db

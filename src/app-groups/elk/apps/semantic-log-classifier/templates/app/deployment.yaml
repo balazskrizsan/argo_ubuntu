@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: semantic-log-classifier
+  labels:
+    app: semantic-log-classifier-label
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: semantic-log-classifier
+  template:
+    metadata:
+      labels:
+        app: semantic-log-classifier-label
+        service: semantic-log-classifier
+    spec:
+      containers:
+        - name: semantic-log-classifier
+          image: placeholder:placeholder
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 200m
+              memory: 200Mi
+            limits:
+              cpu: 400m
+              memory: 400Mi
+          envFrom:
+            - configMapRef:
+                name: semantic-log-classifier-config
+            - secretRef:
+                name: semantic-log-classifier-secrets
+          env:
+            - name: spring.profiles.active
+              value: native
