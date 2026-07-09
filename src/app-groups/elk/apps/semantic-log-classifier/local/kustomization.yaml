@@ -11,7 +11,7 @@ patches:
     patch: |-
       - op: replace
         path: /spec/template/spec/containers/0/image
-        value: kbalazsworks/semantic_log_classifier_api:commit_sha_short_3e142de
+        value: kbalazsworks/semantic_log_classifier_api:commit_sha_short_5995d16
 
   - target: { group: "", version: "v1", kind: "Service", name: "semantic-log-classifier" }
     patch: |-
