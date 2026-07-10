@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elastic-fetcher
+  labels:
+    app: elastic-fetcher-label
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: elastic-fetcher
+  template:
+    metadata:
+      labels:
+        app: elastic-fetcher-label
+        service: elastic-fetcher
+    spec:
+      containers:
+        - name: elastic-fetcher
+          image: placeholder:placeholder
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 400m
+              memory: 1Gi
+            limits:
+              cpu: 800m
+              memory: 2Gi
+          envFrom:
+            - configMapRef:
+                name: elastic-fetcher-config
+          env:
+            - name: spring.profiles.active
+              value: native

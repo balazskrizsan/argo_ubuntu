@@ -8,3 +8,4 @@ resources:
   - ../../apps/kibana/local
   - ../../apps/logstash/local
   - ../../apps/semantic-log-classifier/local
+  - ../../apps/elastic-fetcher/local

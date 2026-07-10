@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elastic-fetcher-psql
+  labels:
+    app: elastic-fetcher-psql-label
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elastic-fetcher-psql-label
+  template:
+    metadata:
+      labels:
+        app: elastic-fetcher-psql-label
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16.2
+          ports:
+            - containerPort: 5432
+          imagePullPolicy: IfNotPresent
+          resources: {}
+          envFrom:
+            - configMapRef:
+                name: insecure-psql-config
+          volumeMounts:
+            - mountPath: "/var/lib/postgresql/data"
+              name: postgresql-storage
+      volumes:
+        - name: postgresql-storage
+          persistentVolumeClaim:
+            claimName: placeholder-postgresql-persistent-volume-claim
