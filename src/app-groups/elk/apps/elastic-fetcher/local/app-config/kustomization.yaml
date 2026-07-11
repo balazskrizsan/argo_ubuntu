@@ -22,5 +22,7 @@ configMapGenerator:
       - APP__ELASTIC_HOST=elasticsearch
       - APP__ELASTIC_PORT=9200
       - APP__ELASTIC_SCHEME=http
+      - APP__ELASTIC_INDEX_NAME=alerting-logs-local
+      - APP__ELASTIC_INDEX_ERROR_NAME=ssp-local-logs*
       - LOGBACK_LOGSTASH_ENABLED=false
       - LOGBACK_LOGSTASH_FULL_HOST=
