@@ -18,3 +18,9 @@ configMapGenerator:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://elastic-fetcher-psql:4083/app_db
       - SPRING_FLYWAY_URL=jdbc:postgresql://elastic-fetcher-psql:4083/app_db
       - NATIVE_REFLECTION_CONFIGURATION_GENERATOR_ENABLED=false
+      - APP__ELASTIC_FETCHER_TASK_ENABLED=true
+      - APP__ELASTIC_HOST=elasticsearch
+      - APP__ELASTIC_PORT=9200
+      - APP__ELASTIC_SCHEME=http
+      - LOGBACK_LOGSTASH_ENABLED=false
+      - LOGBACK_LOGSTASH_FULL_HOST=
