@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: dev-db
+  name: elastic-fetcher-api-psql-test
+  labels:
+    app: elastic-fetcher-api-psql-test-label
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elastic-fetcher-api-psql-test-label
+  template:
+    metadata:
+      labels:
+        app: elastic-fetcher-api-psql-test-label
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16.2
+          ports:
+            - containerPort: 5432
+          imagePullPolicy: IfNotPresent
+          resources: {}
+          env:
+            - name: POSTGRES_USER
+              value: admin
+            - name: POSTGRES_PASSWORD
+              value: password
+            - name: POSTGRES_DB
+              value: app_db
+            - name: PGDATA
+              value: /data/postgres
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: dev-db
+  name: elastic-fetcher-api-psql-test
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 4112
+      targetPort: 5432
+  selector:
+    app: elastic-fetcher-api-psql-test-label
