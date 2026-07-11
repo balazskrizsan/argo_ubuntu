@@ -17,3 +17,4 @@
 | **SLC.api.redis** | :4090 | :4091      | :4092   | :4093                                                                           |       |       |
 | ─────             | ───── | ─────      | ─────   | ─────                                                                           | ───── | ───── |
 | **EF.api**        | :4100 | :4101      | :4102   | :4103 api--elastic-fetcher--smartscrumpoker.localhost.balazskrizsan.com         |       |       |
+| **EF.psql**       | :4110 | :4111      | :4112   | :4113                                                                           |       |       |
