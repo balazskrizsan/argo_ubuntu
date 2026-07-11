@@ -11,7 +11,7 @@ patches:
     patch: |-
       - op: replace
         path: /spec/template/spec/containers/0/image
-        value: kbalazsworks/elastic_fetcher_api:commit_sha_short_36f990b
+        value: kbalazsworks/elastic_fetcher_api:commit_sha_short_6351423
 
   - target: { group: "", version: "v1", kind: "Service", name: "elastic-fetcher" }
     patch: |-
