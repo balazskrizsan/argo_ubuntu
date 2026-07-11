@@ -6,12 +6,14 @@ export APP_NAMESPACES=(
 
 export ENV_CERT_NAMESPACES=(
   "argocd"
+  "elk-local"
 )
 ENV_CERT_NAMESPACES+=("${APP_NAMESPACES[@]}")
 
 export ARGO_APPS=(
   "elk"
   "ssp"
+  "argo-cd"
 )
 
 set_or_update_cert() {

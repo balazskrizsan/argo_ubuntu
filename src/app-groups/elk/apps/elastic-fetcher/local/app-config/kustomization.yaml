@@ -17,3 +17,4 @@ configMapGenerator:
       - SERVER_PORT=4103
       - SPRING_DATASOURCE_URL=jdbc:postgresql://elastic-fetcher-psql:4083/app_db
       - SPRING_FLYWAY_URL=jdbc:postgresql://elastic-fetcher-psql:4083/app_db
+      - NATIVE_REFLECTION_CONFIGURATION_GENERATOR_ENABLED=false
