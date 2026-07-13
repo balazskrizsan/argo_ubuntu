@@ -1,1 +1,0 @@
-kubectl apply -k . --v=6
