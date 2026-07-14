@@ -3,7 +3,6 @@ kind: ConfigMap
 metadata:
   name: elastalert-rules
 data:
-
   elastalert-healthcheck.yaml: |
     name: elastalert_healthcheck
     type: frequency
@@ -17,7 +16,7 @@ data:
   high-severity-per-second-alert.yaml: |
     name: "High severity per-second alert"
     type: frequency
-    index: ssp-*-logs-*
+    index: ssp-local-logs*
     num_events: 1
     timeframe:
       seconds: 1
@@ -37,11 +36,13 @@ data:
   new-poker-started-alert.yaml: |
     name: "New poker started alert"
     type: frequency
-    index: ssp-*-logs-long-term
+    index: alerting-logs-local
     num_events: 1
     timeframe:
       seconds: 1
     filter:
+      - terms:
+          apps: ["ssp_backend"]
       - query:
           query_string:
             query: "message:\"New poker started\""
