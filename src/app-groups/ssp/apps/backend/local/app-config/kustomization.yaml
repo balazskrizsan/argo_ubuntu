@@ -31,6 +31,6 @@ configMapGenerator:
       - LOGBACK_LOG_TYPE=JSON
       - LOGBACK_LOGSTASH_ENABLED=false
       - LOGBACK_LOGSTASH_FULL_HOST=
-      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=https://ids--smartscrumpoker.localhost.balazskrizsan.com
-      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=https://ids--smartscrumpoker.localhost.balazskrizsan.com/.well-known/openid-configuration/jwks
-      - IDS_API_BASE_URL=https://ids--smartscrumpoker.localhost.balazskrizsan.com
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://ids:4043
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://ids:4043/.well-known/openid-configuration/jwks
+      - IDS_API_BASE_URL=http://ids:4043
