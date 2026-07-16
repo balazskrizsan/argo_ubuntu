@@ -15,7 +15,7 @@ configMapGenerator:
     literals:
       - NATIVE_REFLECTION_CONFIGURATION_GENERATOR_ENABLED=false
       - SERVER_ENV=LOCAL
-      - SERVER_PORT=4003
+      - SERVER_PORT=8080
       - SERVER_SOCKET_FULL_HOST=wss://api--smartscrumpoker.localhost.balazskrizsan.com/ws
       - SERVER_SSL_ENABLED=false
       - SERVER_SSL_KEY_STORE=classpath:keystore/certificate.p12
