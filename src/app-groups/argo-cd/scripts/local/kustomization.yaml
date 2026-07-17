@@ -5,3 +5,4 @@ resources:
   - namespace-config.yaml
   - ../../apps/argo-cd/local
   - ../../apps/fluent-bit/local
+  - ../../apps/minikube-dashboard/local
