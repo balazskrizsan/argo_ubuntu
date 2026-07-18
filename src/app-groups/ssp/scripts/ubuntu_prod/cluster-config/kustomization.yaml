@@ -3,7 +3,7 @@ kind: Kustomization
 namespace: ssp-prod
 
 resources:
-  - ../../../apps/common/templates/cert-manager
+  - ../../../apps/common/cert-manager
   - cert-manager/set-cluster-role.yaml
   - cert-manager/set-cluster-role-binding.yaml
   - cert-manager/set-role.yaml
