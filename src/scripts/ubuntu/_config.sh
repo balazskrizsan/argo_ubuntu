@@ -12,9 +12,9 @@ export ENV_CERT_NAMESPACES=(
 ENV_CERT_NAMESPACES+=("${APP_NAMESPACES[@]}")
 
 export ARGO_APPS=(
-  "elk"
-  "ssp"
-  "argo-cd"
+#  "elk"
+#  "ssp"
+  "cluster"
 )
 
 toggle_argo_app() {
