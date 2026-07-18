@@ -25,4 +25,4 @@ if [ "$APP_FOUND" = false ]; then
   exit 1
 fi
 
-toggle_argo_app "create" "ubuntu" "${APP_NAME}"
+toggle_argo_app "delete" "ubuntu" "${APP_NAME}"
