@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: ssp-prod
+
+resources:
+  - ../../../apps/common/templates/cert-manager
+  - cert-manager/set-cluster-role.yaml
+  - cert-manager/set-cluster-role-binding.yaml
+  - cert-manager/set-role.yaml
+  - cert-manager/set-role-binding.yaml
+  - secret-manager/set-cluster-role.yaml
+  - secret-manager/set-cluster-role-binding.yaml
+  - secret-manager/set-role.yaml
+  - secret-manager/set-role-binding.yaml
+  - fluent-bit/service-account.yaml
+  - fluent-bit/set-cluster-role.yaml
+  - fluent-bit/set-cluster-role-binding.yaml
+  - fluent-bit/set-role.yaml
+  - fluent-bit/set-role-binding.yaml
