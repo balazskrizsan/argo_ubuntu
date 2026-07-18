@@ -2,17 +2,17 @@
 
 export APP_NAMESPACES=(
   "ssp-prod"
+  "elk"
 )
 
 export ENV_CERT_NAMESPACES=(
   "argo-cd"
-#  "elk-local"
   "kubernetes-dashboard"
 )
 ENV_CERT_NAMESPACES+=("${APP_NAMESPACES[@]}")
 
 export ARGO_APPS=(
-#  "elk"
+  "elk"
 #  "ssp"
   "cluster"
 )
