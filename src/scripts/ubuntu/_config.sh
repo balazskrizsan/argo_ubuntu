@@ -1,12 +1,12 @@
 #!/bin/bash
 
 export APP_NAMESPACES=(
-  "ssp-local"
+  "ssp-prod"
 )
 
 export ENV_CERT_NAMESPACES=(
   "argo-cd"
-  "elk-local"
+#  "elk-local"
   "kubernetes-dashboard"
 )
 ENV_CERT_NAMESPACES+=("${APP_NAMESPACES[@]}")
