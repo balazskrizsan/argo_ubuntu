@@ -10,7 +10,7 @@ spec:
   project: default
   source:
     path: src/app-groups/elk/scripts/ubuntu
-    repoURL: https://github.com/balazskrizsan/smart_scrum_poker_argo
+    repoURL: https://github.com/balazskrizsan/argo_ubuntu
     targetRevision: main
   syncPolicy:
     automated:
