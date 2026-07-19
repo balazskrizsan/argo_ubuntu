@@ -3,9 +3,9 @@ kind: Kustomization
 
 resources:
   - ../../apps/common/ubuntu
-#  - ../../apps/elastalert/local
+#  - ../../apps/elastalert/ubuntu
   - ../../apps/elastic/ubuntu
-#  - ../../apps/kibana/local
+  - ../../apps/kibana/ubuntu
   - ../../apps/logstash/ubuntu
 #  - ../../apps/semantic-log-classifier/local
 #  - ../../apps/elastic-fetcher/local
