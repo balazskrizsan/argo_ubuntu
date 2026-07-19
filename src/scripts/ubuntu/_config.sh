@@ -13,7 +13,7 @@ ENV_CERT_NAMESPACES+=("${APP_NAMESPACES[@]}")
 
 export ARGO_APPS=(
   "elk"
-#  "ssp"
+  "ssp"
   "cluster"
 )
 
