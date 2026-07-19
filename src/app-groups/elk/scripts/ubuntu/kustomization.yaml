@@ -6,6 +6,6 @@ resources:
 #  - ../../apps/elastalert/local
   - ../../apps/elastic/ubuntu
 #  - ../../apps/kibana/local
-#  - ../../apps/logstash/local
+  - ../../apps/logstash/ubuntu
 #  - ../../apps/semantic-log-classifier/local
 #  - ../../apps/elastic-fetcher/local
