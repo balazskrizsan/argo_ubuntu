@@ -3,9 +3,9 @@ kind: Kustomization
 
 resources:
   - namespace-config.yaml
-  - ../../apps/common/local
-  - ../../apps/fluent-bit/local
-  - ../../apps/aws-services/local
-  - ../../apps/identity-service/local
-  - ../../apps/backend/local
-  - ../../apps/frontend/local
+#  - ../../apps/common/ubuntu
+#  - ../../apps/fluent-bit/ubuntu
+#  - ../../apps/aws-services/ubuntu
+#  - ../../apps/identity-service/ubuntu
+#  - ../../apps/backend/ubuntu
+#  - ../../apps/frontend/ubuntu
