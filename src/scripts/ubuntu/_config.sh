@@ -3,6 +3,7 @@
 export APP_NAMESPACES=(
   "ssp-prod"
   "elk"
+  "grafana"
 )
 
 export ENV_CERT_NAMESPACES=(
@@ -15,6 +16,7 @@ export ARGO_APPS=(
   "elk"
   "ssp"
   "cluster"
+  "grafana"
 )
 
 toggle_argo_app() {

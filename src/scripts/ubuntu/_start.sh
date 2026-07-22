@@ -7,3 +7,4 @@
 ./start-argo-app.sh elk
 ./start-argo-app.sh ssp
 ./start-argo-app.sh cluster
+#./start-argo-app.sh grafana

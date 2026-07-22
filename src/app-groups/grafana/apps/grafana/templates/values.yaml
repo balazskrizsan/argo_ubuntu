@@ -1,0 +1,57 @@
+# Grafana values based on ELK configuration
+persistence:
+  enabled: true
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  size: 10Gi
+
+service:
+  type: ClusterIP
+  port: 3000
+  targetPort: 3000
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: grafana.ssp.balazskrizsan.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: env-cert
+      hosts:
+        - grafana.ssp.balazskrizsan.com
+
+env:
+  GF_SERVER_ROOT_URL: "https://grafana.ssp.balazskrizsan.com"
+  GF_INSTALL_PLUGINS: "grafana-piechart-panel"
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://prometheus-server.grafana.svc.cluster.local
+        isDefault: true
+        editable: true
+
+# Security configuration
+adminPassword: "password"
+security:
+  disableInitialAdminCreation: false
+
+# Resource limits
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
