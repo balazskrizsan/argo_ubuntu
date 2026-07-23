@@ -5,7 +5,7 @@ resources:
   - namespace-config.yaml
   - ../../apps/common/ubuntu
 #  - ../../apps/fluent-bit/ubuntu
-#  - ../../apps/aws-services/ubuntu
+  - ../../apps/aws-services/ubuntu
 #  - ../../apps/identity-service/ubuntu
 #  - ../../apps/backend/ubuntu
 #  - ../../apps/frontend/ubuntu
