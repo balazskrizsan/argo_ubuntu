@@ -19,7 +19,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: argo-cd-fluent-bit
-  namespace: argo-cd
+  namespace: argocd
 roleRef:
   kind: ClusterRole
   name: argo-cd-fluent-bit
