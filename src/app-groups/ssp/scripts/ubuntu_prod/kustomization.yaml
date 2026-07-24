@@ -6,6 +6,6 @@ resources:
   - ../../apps/common/ubuntu
 #  - ../../apps/fluent-bit/ubuntu
   - ../../apps/aws-services/ubuntu
-#  - ../../apps/identity-service/ubuntu
+  - ../../apps/identity-service/ubuntu_prod
 #  - ../../apps/backend/ubuntu
 #  - ../../apps/frontend/ubuntu

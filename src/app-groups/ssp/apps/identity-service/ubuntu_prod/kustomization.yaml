@@ -1,0 +1,73 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: ssp-prod
+
+resources:
+  - app-config
+  - ../templates
+
+patches:
+  - target: { group: "apps", version: "v1", kind: "Deployment", name: "ids" }
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: kbalazsworks/smart_scrum_poker_v2_identity_service:commit_sha_short_16777a1
+
+  - target: { group: "", version: "v1", kind: "Service", name: "ids" }
+    patch: |-
+      - op: replace
+        path: /spec/type
+        value: LoadBalancer
+
+      - op: replace
+        path: /spec/ports/0/port
+        value: 4043
+
+      - op: add
+        path: /spec/ports/0/nodePort
+        value: 30404
+
+  - target: { group: "networking.k8s.io",  version: "v1", kind: "Ingress", name: "ids" }
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/http/paths/0/backend/service/port/number
+        value: 4043
+
+      - op: replace
+        path: /spec/rules/0/host
+        value: identity-service.smartscrumpoker.com
+
+      - op: add
+        path: /spec/tls
+        value:
+          - hosts:
+              - identity-service.smartscrumpoker.com
+            secretName: env-cert
+
+### PSQL
+
+  - target: { group: "", version: "v1", kind: "Service", name: "ids-psql-service" }
+    patch: |-
+      - op: replace
+        path: /spec/ports/0/port
+        value: 4053
+
+  - target: { group: "", version: "v1", kind: "Service", name: "ids-psql-service" }
+    patch: |-
+      - op: replace
+        path: /spec/type
+        value: LoadBalancer
+
+  - target: { group: "apps", version: "v1", kind: "Deployment", name: "ids-psql" }
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/volumes/0/persistentVolumeClaim/claimName
+        value: ssp--ids--local--psql--persistent-volume-claim
+
+### Fluent Bit
+
+  - target: { group: "", version: "v1", kind: "ConfigMap", name: "fluent-bit-env" }
+    patch: |-
+      - op: replace
+        path: /data/app_name
+        value: ids

@@ -1,19 +1,19 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: ssp-local
+namespace: ssp-prod
 
 resources:
-  - ssp--ids--local--psql--persistent-volume.yaml
-  - ssp--ids--local--psql--persistent-volume-claim.yaml
-  - ssp--ids--local--dp-persistent-volume.yaml
-  - ssp--ids--local--dp-persistent-volume-claim.yaml
+  - ssp--ids--prod--psql--persistent-volume.yaml
+  - ssp--ids--prod--psql--persistent-volume-claim.yaml
+  - ssp--ids--prod--dp-persistent-volume.yaml
+  - ssp--ids--prod--dp-persistent-volume-claim.yaml
 
 generatorOptions:
   disableNameSuffixHash: true
 
 configMapGenerator:
   - name: ids-config
-    namespace: ssp-local
+    namespace: ssp-prod
     literals:
       - Certificate__Password=password
       - Certificate__Path=keystore/certificate.pfx
@@ -29,4 +29,4 @@ configMapGenerator:
       - Logging__LogstashHost=disabled
       - Logging__LogstashPort=1111
       - Logging__LogType=JSON
-      - ASPNETCORE_ENVIRONMENT=LOCAL
+      - ASPNETCORE_ENVIRONMENT=PROD
