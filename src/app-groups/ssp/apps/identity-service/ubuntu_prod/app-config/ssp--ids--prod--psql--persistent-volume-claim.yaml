@@ -6,6 +6,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   storageClassName: manual
+  volumeName: ssp--ids--prod--psql--persistent-volume
   resources:
     requests:
       storage: 10Gi
