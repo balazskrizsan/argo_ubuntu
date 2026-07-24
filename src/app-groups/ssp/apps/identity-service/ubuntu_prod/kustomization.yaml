@@ -62,7 +62,7 @@ patches:
     patch: |-
       - op: replace
         path: /spec/template/spec/volumes/0/persistentVolumeClaim/claimName
-        value: ssp--ids--local--psql--persistent-volume-claim
+        value: ssp--ids--prod--psql--persistent-volume-claim
 
 ### Fluent Bit
 
