@@ -3,9 +3,7 @@ kind: Kustomization
 namespace: ssp-prod
 
 resources:
-  - ssp--ids--prod--psql--persistent-volume.yaml
   - ssp--ids--prod--psql--persistent-volume-claim.yaml
-  - ssp--ids--prod--dp-persistent-volume.yaml
   - ssp--ids--prod--dp-persistent-volume-claim.yaml
 
 generatorOptions:
