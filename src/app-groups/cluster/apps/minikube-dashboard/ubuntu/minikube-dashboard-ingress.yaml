@@ -5,6 +5,7 @@ metadata:
   namespace: kubernetes-dashboard
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
 spec:
   rules:
     - host: minikube-dashboard.smartscrumpoker.balazskrizsan.com
@@ -16,4 +17,4 @@ spec:
               service:
                 name: kubernetes-dashboard
                 port:
-                  number: 80
+                  number: 443
