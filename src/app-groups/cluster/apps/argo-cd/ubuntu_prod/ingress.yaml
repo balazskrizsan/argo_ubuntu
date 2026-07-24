@@ -8,7 +8,7 @@ metadata:
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
 spec:
   rules:
-    - host: "argocd.smart-scrum-poker.balazskrizsan.com"
+    - host: "argocd.smartscrumpoker.balazskrizsan.com"
       http:
         paths:
           - path: /

@@ -8,10 +8,10 @@ metadata:
 spec:
   tls:
     - hosts:
-        - "logstash.smart-scrum-poker.balazskrizsan.com"
+        - "logstash.smartscrumpoker.balazskrizsan.com"
       secretName: env-ert
   rules:
-    - host: "logstash.smart-scrum-poker.balazskrizsan.com"
+    - host: "logstash.smartscrumpoker.balazskrizsan.com"
       http:
         paths:
           - path: /

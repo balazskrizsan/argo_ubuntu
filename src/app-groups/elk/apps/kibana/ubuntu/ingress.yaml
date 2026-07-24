@@ -8,7 +8,7 @@ metadata:
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
 spec:
   rules:
-    - host: "kibana.smart-scrum-poker.balazskrizsan.com"
+    - host: "kibana.smartscrumpoker.balazskrizsan.com"
       http:
         paths:
           - path: /
