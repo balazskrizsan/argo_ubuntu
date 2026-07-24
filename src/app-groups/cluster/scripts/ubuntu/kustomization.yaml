@@ -3,6 +3,6 @@ kind: Kustomization
 
 resources:
 #  - namespace-config.yaml
-  - ../../apps/argo-cd/ubuntu_prod
+  - ../../apps/argo-cd/ubuntu
 #  - ../../apps/fluent-bit/local
-#  - ../../apps/minikube-dashboard/local
+  - ../../apps/minikube-dashboard/ubuntu

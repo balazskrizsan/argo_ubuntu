@@ -3,4 +3,4 @@ kind: Kustomization
 namespace: argo-cd
 
 resources:
-  - ingress.yaml
+  - argocd-ingress.yaml
