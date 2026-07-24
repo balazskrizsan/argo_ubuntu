@@ -5,6 +5,8 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
+  storageClassName: manual
+  volumeName: ssp--backend--local--psql--persistent-volume
   resources:
     requests:
       storage: 10Gi

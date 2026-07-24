@@ -7,5 +7,7 @@ spec:
     storage: 10Gi
   accessModes:
     - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
   hostPath:
     path: "/mnt/ssp/elk__elastic_fetcher__local__psql__persistent_volume"

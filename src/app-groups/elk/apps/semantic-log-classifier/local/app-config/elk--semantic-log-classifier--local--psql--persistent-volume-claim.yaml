@@ -5,6 +5,8 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
+  storageClassName: manual
+  volumeName: elk--semantic-log-classifier--local--psql--persistent-volume
   resources:
     requests:
       storage: 10Gi
