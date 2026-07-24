@@ -1,7 +1,13 @@
+config place: /etc/nginx/sites-available/default
+restart command: sudo systemctl restart nginx
+
+===================== file content =====================
 server {
         listen 443 ssl http2;
         server_name smartscrumpoker.com
                     api.smartscrumpoker.com
+                    identity-service.smartscrumpoker.com
+                    api--aws-services.smartscrumpoker.com
 
                     ids.smart-scrum-poker.balazskrizsan.com
                     uat.smartscrumpoker.balazskrizsan.com
