@@ -5,6 +5,6 @@
 ./set-cluster-config.sh
 #./start-argo-apps.sh
 ./start-argo-app.sh elk
-#./start-argo-app.sh ssp
-#./start-argo-app.sh argo-cd
+./start-argo-app.sh ssp
+./start-argo-app.sh argo-cd
 

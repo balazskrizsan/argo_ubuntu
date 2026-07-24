@@ -5,4 +5,5 @@
 ./stop-argo-app.sh ssp
 ./stop-argo-app.sh cluster
 ./argocd-remove-finalizers.sh
+./unbind-claims.sh
 ./delete-namespaces.sh
