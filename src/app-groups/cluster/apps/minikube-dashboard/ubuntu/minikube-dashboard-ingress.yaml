@@ -7,7 +7,7 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-    - host: minikube-dashboard.balazskrizsan.com
+    - host: minikube-dashboard.smartscrumpoker.balazskrizsan.com
       http:
         paths:
           - path: /
