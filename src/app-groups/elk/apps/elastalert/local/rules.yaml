@@ -12,26 +12,26 @@ data:
       minutes: 1
     alert:
       - debug
-
-  high-severity-per-second-alert.yaml: |
-    name: "High severity per-second alert"
-    type: frequency
-    index: ssp-local-logs*
-    num_events: 1
-    timeframe:
-      seconds: 1
-    filter:
-      - range:
-          level_value:
-            gt: 30001
-    alert: post2
-    http_post2_url: "https://api.pushover.net/1/messages.json"
-    http_post2_payload: 
-      token: ${PUSHOVER_TOKEN}
-      user: ${PUSHOVER_USER}
-      message: High severity log detected!
-    realert:
-      minutes: 10
+#
+#  high-severity-per-second-alert.yaml: |
+#    name: "High severity per-second alert"
+#    type: frequency
+#    index: ssp-local-logs*
+#    num_events: 1
+#    timeframe:
+#      seconds: 1
+#    filter:
+#      - range:
+#          level_value:
+#            gt: 30001
+#    alert: post2
+#    http_post2_url: "https://api.pushover.net/1/messages.json"
+#    http_post2_payload:
+#      token: ${PUSHOVER_TOKEN}
+#      user: ${PUSHOVER_USER}
+#      message: High severity log detected!
+#    realert:
+#      minutes: 10
 
   new-poker-started-alert.yaml: |
     name: "New poker started alert"
