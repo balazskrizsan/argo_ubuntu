@@ -17,7 +17,7 @@ patches:
     patch: |-
       - op: replace
         path: /spec/type
-        value: LoadBalancer
+        value: NodePort
 
       - op: replace
         path: /spec/ports/0/port
@@ -56,7 +56,7 @@ patches:
     patch: |-
       - op: replace
         path: /spec/type
-        value: LoadBalancer
+        value: NodePort
 
   - target: { group: "apps", version: "v1", kind: "Deployment", name: "ids" }
     patch: |-
