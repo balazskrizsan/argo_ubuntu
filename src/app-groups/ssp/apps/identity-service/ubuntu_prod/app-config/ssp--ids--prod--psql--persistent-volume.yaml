@@ -10,4 +10,4 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: manual
   hostPath:
-    path: "/mnt/ssp/ssp__ids__local__psql__persistent_volume"
+    path: "/mnt/ssp/ssp__ids__prod__psql__persistent_volume"

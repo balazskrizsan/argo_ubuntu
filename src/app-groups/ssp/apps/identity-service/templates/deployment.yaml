@@ -59,4 +59,4 @@ spec:
       volumes:
         - name: dpkeys
           persistentVolumeClaim:
-            claimName: ssp--ids--local--dp-persistent-volume-claim
+            claimName: ssp--ids--PLACEHOLDER--dp-persistent-volume-claim
