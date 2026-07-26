@@ -8,4 +8,4 @@ resources:
   - ../../apps/aws-services/ubuntu_prod
   - ../../apps/identity-service/ubuntu_prod
 #  - ../../apps/backend/ubuntu
-#  - ../../apps/frontend/ubuntu
+  - ../../apps/frontend/ubuntu_prod
