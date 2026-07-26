@@ -23,10 +23,6 @@ patches:
         path: /spec/ports/0/port
         value: 4003
 
-      - op: add
-        path: /spec/ports/0/nodePort
-        value: 30405
-
   - target: { group: "networking.k8s.io",  version: "v1", kind: "Ingress", name: "backend" }
     patch: |-
       - op: replace
