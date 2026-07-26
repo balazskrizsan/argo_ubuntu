@@ -50,7 +50,7 @@ patches:
     patch: |-
       - op: replace
         path: /spec/type
-        value: LoadBalancer
+        value: NodePort
 
   - target: { group: "apps", version: "v1", kind: "Deployment", name: "backend-psql" }
     patch: |-
