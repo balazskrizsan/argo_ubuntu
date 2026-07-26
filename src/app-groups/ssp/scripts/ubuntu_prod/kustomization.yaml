@@ -7,5 +7,5 @@ resources:
 #  - ../../apps/fluent-bit/ubuntu
   - ../../apps/aws-services/ubuntu_prod
   - ../../apps/identity-service/ubuntu_prod
-#  - ../../apps/backend/ubuntu
+  - ../../apps/backend/ubuntu_prod
   - ../../apps/frontend/ubuntu_prod
