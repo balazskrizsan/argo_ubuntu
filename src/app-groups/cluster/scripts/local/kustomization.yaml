@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - namespace-config.yaml
+  - argocd-cm.yaml
   - ../../apps/argo-cd/local
   - ../../apps/fluent-bit/local
   - ../../apps/minikube-dashboard/local

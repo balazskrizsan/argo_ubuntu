@@ -12,8 +12,6 @@ spec:
     path: src/app-groups/grafana/scripts/ubuntu
     repoURL: https://github.com/balazskrizsan/argo_ubuntu
     targetRevision: master
-    kustomize:
-      buildOptions: --enable-helm
   syncPolicy:
     automated:
       prune: true
