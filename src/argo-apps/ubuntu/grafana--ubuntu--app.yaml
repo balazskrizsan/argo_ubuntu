@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: grafana--ubuntu--app
+  namespace: argocd
+spec:
+  destination:
+    namespace: grafana
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: src/app-groups/grafana/scripts/ubuntu
+    repoURL: https://github.com/balazskrizsan/argo_ubuntu
+    targetRevision: master
+    kustomize:
+      buildOptions: --enable-helm
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: false
+    syncOptions:
+      - CreateNamespace=true
