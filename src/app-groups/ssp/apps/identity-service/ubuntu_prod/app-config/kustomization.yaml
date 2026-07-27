@@ -30,3 +30,5 @@ configMapGenerator:
       - Logging__LogstashPort=1111
       - Logging__LogType=JSON
       - ASPNETCORE_ENVIRONMENT=PROD
+      - AwsServices__FullUrl=https://aws-services.smartscrumpoker.com/
+      - Cookie__Domain=.balazskrizsan.com
