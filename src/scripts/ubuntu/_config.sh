@@ -1,9 +1,10 @@
 #!/bin/bash
 
+source ../common/_functions.sh
+
 export APP_NAMESPACES=(
   "ssp-prod"
   "elk"
-  "grafana"
 )
 
 export ENV_CERT_NAMESPACES=(
@@ -16,23 +17,5 @@ export ARGO_APPS=(
   "elk"
   "ssp"
   "cluster"
-  "grafana"
 )
 
-toggle_argo_app() {
-  local command="$1"
-  local env="$2"
-  local app="$3"
-
-  echo "Argo app: $command => $env / $app"
-
-  goto_src
-
-  cd "argo-apps/$env/" || exit
-
-  kubectl $command -f "./$app--$env--app.yaml"
-}
-
-goto_src() {
-  cd "./../../" || exit
-}

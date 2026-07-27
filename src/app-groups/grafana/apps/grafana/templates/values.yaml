@@ -1,4 +1,3 @@
-# Grafana values based on ELK configuration
 persistence:
   enabled: true
   storageClassName: standard
