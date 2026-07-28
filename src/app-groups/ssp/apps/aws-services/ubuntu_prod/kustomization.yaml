@@ -23,7 +23,7 @@ patches:
         path: /spec/ports/0/port
         value: 4073
 
-     - op: replace
+      - op: replace
         path: /spec/ports/0/targetPort
         value: 8080
 
