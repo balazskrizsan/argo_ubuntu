@@ -19,12 +19,8 @@ metadata:
       }
 spec:
   ingressClassName: nginx
-  tls:
-    - hosts:
-        - "api-ssp-placeholder.balazskrizsan.com"
-      secretName: env-cert
   rules:
-    - host: "api-ssp-placeholder.balazskrizsan.com"
+    - host: "api--aws-services.placeholder.com"
       http:
         paths:
           - pathType: ImplementationSpecific

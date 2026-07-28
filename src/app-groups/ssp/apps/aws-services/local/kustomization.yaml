@@ -21,19 +21,21 @@ patches:
 
       - op: replace
         path: /spec/ports/0/port
-        value: 1234
+        value: 4073
 
   - target: { group: "networking.k8s.io",  version: "v1", kind: "Ingress", name: "aws-services" }
     patch: |-
       - op: replace
         path: /spec/rules/0/http/paths/0/backend/service/port/number
-        value: 1234
+        value: 4073
 
       - op: replace
         path: /spec/rules/0/host
         value: api--aws-services--smartscrumpoker.localhost.balazskrizsan.com
 
-      - op: replace
-        path: /spec/tls/0/hosts
+      - op: add
+        path: /spec/tls
         value:
-          - api--aws-services--smartscrumpoker.localhost.balazskrizsan.com
+          - hosts:
+              - api--aws-services--smartscrumpoker.localhost.balazskrizsan.com
+            secretName: env-cert
