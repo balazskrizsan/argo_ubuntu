@@ -11,7 +11,7 @@ configMapGenerator:
     literals:
       - SERVER_SSL_ENABLED=false
       - SPRING_APPLICATION_ENV=PROD
-      - OIDC_INTROSPECTION_URI=http://ids.ssp-local.svc.cluster.local:4043/connect/introspect
+      - OIDC_INTROSPECTION_URI=http://ids:4043/connect/introspect
       - NATIVE_REFLECTION_CONFIGURATION_GENERATOR_ENABLED=false
       - LOGBACK_LOG_TYPE=JSON
       - LOGBACK_LOGSTASH_ENABLED=false
