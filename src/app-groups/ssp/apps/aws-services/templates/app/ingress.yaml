@@ -19,6 +19,10 @@ metadata:
       }
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - "api--aws-services.placeholder.com"
+      secretName: env-cert
   rules:
     - host: "api--aws-services.placeholder.com"
       http:
