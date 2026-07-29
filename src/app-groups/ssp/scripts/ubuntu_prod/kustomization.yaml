@@ -4,7 +4,7 @@ kind: Kustomization
 resources:
   - namespace-config.yaml
   - ../../apps/common/ubuntu
-#  - ../../apps/fluent-bit/ubuntu
+  - ../../apps/fluent-bit/ubuntu_prod
   - ../../apps/aws-services/ubuntu_prod
   - ../../apps/identity-service/ubuntu_prod
   - ../../apps/backend/ubuntu_prod
