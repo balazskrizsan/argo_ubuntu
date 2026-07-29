@@ -12,5 +12,5 @@ configMapGenerator:
     namespace: ssp-prod
     literals:
       - env=PROD
-      - logstash_host=logstash.elk.svc.cluster.prod
+      - logstash_host=logstash.elk.svc.cluster.local
       - logstash_port=5044
