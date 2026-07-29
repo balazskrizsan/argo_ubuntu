@@ -1,6 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: ssp-local
+namespace: ssp-prod
 
 #todo: is that file needed?
 
@@ -9,8 +9,8 @@ generatorOptions:
 
 configMapGenerator:
   - name: fluent-bit-env
-    namespace: ssp-local
+    namespace: ssp-prod
     literals:
-      - env=LOCAL
-      - logstash_host=logstash.elk-local.svc.cluster.local
+      - env=PROD
+      - logstash_host=logstash.elk.svc.cluster.prod
       - logstash_port=5044
