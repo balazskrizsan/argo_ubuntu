@@ -6,4 +6,5 @@
 #./start-argo-apps.sh
 ./start-argo-app.sh elk
 ./start-argo-app.sh ssp
+./start-argo-app.sh ssp-uat
 ./start-argo-app.sh cluster
