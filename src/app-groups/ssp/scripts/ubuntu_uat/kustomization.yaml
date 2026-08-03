@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
   - namespace-config.yaml
-  - ../../apps/common/ubuntu
+  - ../../apps/common/ubuntu_uat
   - ../../apps/fluent-bit/ubuntu_uat
   - ../../apps/aws-services/ubuntu_uat
   - ../../apps/identity-service/ubuntu_uat
