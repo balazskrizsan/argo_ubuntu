@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - namespace-config.yaml
+  - cluster-config
   - ../../apps/common/ubuntu_uat
   - ../../apps/fluent-bit/ubuntu_uat
   - ../../apps/aws-services/ubuntu_uat
