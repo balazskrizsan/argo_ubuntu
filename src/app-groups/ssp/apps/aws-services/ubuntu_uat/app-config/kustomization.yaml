@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: ssp-uat
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+  - name: aws-services-config
+    namespace: ssp-uat
+    literals:
+      - SERVER_SSL_ENABLED=false
+      - SPRING_APPLICATION_ENV=UAT
+      - OIDC_INTROSPECTION_URI=http://ids:4044/connect/introspect
+      - NATIVE_REFLECTION_CONFIGURATION_GENERATOR_ENABLED=false
+      - LOGBACK_LOG_TYPE=JSON
+      - LOGBACK_LOGSTASH_ENABLED=false
+      - LOGBACK_LOGSTASH_FULL_HOST=
