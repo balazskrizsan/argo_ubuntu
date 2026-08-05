@@ -9,13 +9,15 @@ server {
                     identity-service.smartscrumpoker.com
                     api--aws-services.smartscrumpoker.com
 
-                    ids.smart-scrum-poker.balazskrizsan.com
-                    uat.smartscrumpoker.balazskrizsan.com
-                    api.uat.smartscrumpoker.balazskrizsan.com
+                    smartscrumpoker.balazskrizsan.com
+                    api.smartscrumpoker.balazskrizsan.com
+                    identity-service.smartscrumpoker.balazskrizsan.com
+                    api--identity-service.smartscrumpoker.balazskrizsan.com
+                    api--aws-services.smartscrumpoker.balazskrizsan.com
                     ;
 
-        ssl_certificate /certs/certificate.crt;
-        ssl_certificate_key /certs/private.key;
+        ssl_certificate /argo_ubuntu_certs_secrets/certificate.crt;
+        ssl_certificate_key /argo_ubuntu_certs_secrets/private.key;
 
         location / {
                 proxy_pass https://minikube.local;
@@ -43,14 +45,20 @@ server {
 
 server {
         listen 443 ssl http2;
-        server_name argocd.smart-scrum-poker.balazskrizsan.com
-                    minikube-dashboard.smart-scrum-poker.balazskrizsan.com
-                    kibana.smart-scrum-poker.balazskrizsan.com
-                    pgadmin.smart-scrum-poker.balazskrizsan.com
+        server_name argocd.smartscrumpoker.balazskrizsan.com
+                    minikube-dashboard.smartscrumpoker.balazskrizsan.com
+                    kibana.smartscrumpoker.balazskrizsan.com
+                    pgadmin.smartscrumpoker.balazskrizsan.com
+
+                    smartscrumpoker.balazskrizsan.com
+                    api.smartscrumpoker.balazskrizsan.com
+                    identity-service.smartscrumpoker.balazskrizsan.com
+                    api--identity-service.smartscrumpoker.balazskrizsan.com
+                    api--aws-services.smartscrumpoker.balazskrizsan.com
                     ;
 
-        ssl_certificate /certs/certificate.crt;
-        ssl_certificate_key /certs/private.key;
+        ssl_certificate /argo_ubuntu_certs_secrets/certificate.crt;
+        ssl_certificate_key /argo_ubuntu_certs_secrets/private.key;
 
         #ssl_client_certificate /certs/auth/ca.crt;
         #ssl_verify_client on;
@@ -71,18 +79,20 @@ server {
 
 server {
         listen 80;
-        server_name argocd.smart-scrum-poker.balazskrizsan.com
-                    minikube-dashboard.smart-scrum-poker.balazskrizsan.com
-                    kibana.smart-scrum-poker.balazskrizsan.com
-                    pgadmin.smart-scrum-poker.balazskrizsan.com
+        server_name argocd.smartscrumpoker.balazskrizsan.com
+                    minikube-dashboard.smartscrumpoker.balazskrizsan.com
+                    kibana.smartscrumpoker.balazskrizsan.com
+                    pgadmin.smartscrumpoker.balazskrizsan.com
 
                     smartscrumpoker.com
                     api.smartscrumpoker.com
-                    ids.smart-scrum-poker.balazskrizsan.com
-                    uat.smartscrumpoker.balazskrizsan.com
-                    api.uat.smartscrumpoker.balazskrizsan.com
-                    ;
 
+                    smartscrumpoker.balazskrizsan.com
+                    api.smartscrumpoker.balazskrizsan.com
+                    identity-service.smartscrumpoker.balazskrizsan.com
+                    api--identity-service.smartscrumpoker.balazskrizsan.com
+                    api--aws-services.smartscrumpoker.balazskrizsan.com
+                    ;
 
         return 301 https://$host$request_uri;
 }
