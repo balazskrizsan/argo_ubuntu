@@ -26,4 +26,4 @@ patches:
 
       - op: replace
         path: /spec/rules/0/host
-        value: smartscrumpoket.balazskrizsan.com
+        value: smartscrumpoker.balazskrizsan.com

@@ -31,12 +31,12 @@ patches:
 
       - op: replace
         path: /spec/rules/0/host
-        value: api.smartscrumpoket.balazskrizsan.com
+        value: api.smartscrumpoker.balazskrizsan.com
 
       - op: replace
         path: /spec/tls/0/hosts
         value:
-          - api.smartscrumpoket.balazskrizsan.com
+          - api.smartscrumpoker.balazskrizsan.com
 
 ### PSQL
 

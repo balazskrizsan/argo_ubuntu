@@ -19,9 +19,9 @@ configMapGenerator:
       - Certificate__Path=keystore/certificate.pfx
       - Certificate__UseHttps=false
       - ConnectionStrings__DefaultConnection="Host=ids-psql-service;Port=4054;Database=app_db;Username=admin;Password=admin_pass"
-      - IdentityServer__FrontendCorsOrigin=https://smartscrumpoket.balazskrizsan.com
-      - IdentityServer__FrontendRedirectUri=https://smartscrumpoket.balazskrizsan.com/auth-callback
-      - IdentityServer__IssuerUri=https://identity-service.smartscrumpoket.balazskrizsan.com/
+      - IdentityServer__FrontendCorsOrigin=https://smartscrumpoker.balazskrizsan.com
+      - IdentityServer__FrontendRedirectUri=https://smartscrumpoker.balazskrizsan.com/auth-callback
+      - IdentityServer__IssuerUri=https://identity-service.smartscrumpoker.balazskrizsan.com/
       - IdentityServer__Port=8080
       - IdentityServer_ForceHttpsRewrite=true
       - Logging__AppName=ssp_identity_service
@@ -30,5 +30,5 @@ configMapGenerator:
       - Logging__LogstashPort=1111
       - Logging__LogType=JSON
       - ASPNETCORE_ENVIRONMENT=UAT
-      - AwsServices__FullUrl=https://api--aws-services.smartscrumpoket.balazskrizsan.com/
-      - Cookie__Domain=.smartscrumpoket.balazskrizsan.com
+      - AwsServices__FullUrl=https://api--aws-services.smartscrumpoker.balazskrizsan.com/
+      - Cookie__Domain=.smartscrumpoker.balazskrizsan.com

@@ -16,12 +16,12 @@ configMapGenerator:
       - NATIVE_REFLECTION_CONFIGURATION_GENERATOR_ENABLED=false
       - SERVER_ENV=UAT
       - SERVER_PORT=8080
-      - SERVER_SOCKET_FULL_HOST=wss://api.smartscrumpoket.balazskrizsan.com/ws
+      - SERVER_SOCKET_FULL_HOST=wss://api.smartscrumpoker.balazskrizsan.com/ws
       - SERVER_SSL_ENABLED=false
       - SERVER_SSL_KEY_STORE=classpath:keystore/certificate.p12
       - SERVER_SSL_KEY_STORE_PASSWORD=password
-      - SITE_DOMAIN=smartscrumpoket.balazskrizsan.com
-      - SITE_FRONTEND_HOST=https://smartscrumpoket.balazskrizsan.com/
+      - SITE_DOMAIN=smartscrumpoker.balazskrizsan.com
+      - SITE_FRONTEND_HOST=https://smartscrumpoker.balazskrizsan.com/
       - SOCKET_IS_ENABLED_SOCKET_CONNECT_AND_DISCONNECT_LISTENERS=true
       - SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE=10
       - SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE=10
