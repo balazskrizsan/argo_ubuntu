@@ -35,13 +35,13 @@ patches:
 
       - op: replace
         path: /spec/rules/0/host
-        value: identity-service.smartscrumpoker.krizsanbalazs.com
+        value: identity-service.smartscrumpoker.balazskrizsan.com
 
       - op: add
         path: /spec/tls
         value:
           - hosts:
-              - identity-service.smartscrumpoker.krizsanbalazs.com
+              - identity-service.smartscrumpoker.balazskrizsan.com
             secretName: env-cert
 
   - target: { group: "apps", version: "v1", kind: "Deployment", name: "ids" }
