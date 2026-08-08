@@ -7,13 +7,8 @@ server {
         server_name smartscrumpoker.com
                     api.smartscrumpoker.com
                     identity-service.smartscrumpoker.com
+                    api--identity-service.smartscrumpoker.com
                     api--aws-services.smartscrumpoker.com
-
-                    smartscrumpoker.balazskrizsan.com
-                    api.smartscrumpoker.balazskrizsan.com
-                    identity-service.smartscrumpoker.balazskrizsan.com
-                    api--identity-service.smartscrumpoker.balazskrizsan.com
-                    api--aws-services.smartscrumpoker.balazskrizsan.com
                     ;
 
         ssl_certificate /argo_ubuntu_certs_secrets/certificate.crt;
@@ -73,6 +68,16 @@ server {
                 proxy_set_header Upgrade $http_upgrade;
                 proxy_set_header Connection "Upgrade";
                 proxy_cookie_path / "/; Secure; HttpOnly; SameSite=None";
+                proxy_ssl_verify off;
+        }
+
+        location /ws {
+                proxy_pass https://minikube.local;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "Upgrade";
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-Proto ws;
                 proxy_ssl_verify off;
         }
 }
