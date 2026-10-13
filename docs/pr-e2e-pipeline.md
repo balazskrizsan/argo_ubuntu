@@ -52,9 +52,13 @@
      (this is the current setup) and the sops Job is deleted.
    Only then wait for the deployment rollouts.
 7. **Smoke check** frontend + IDS discovery endpoint over HTTPS.
-8. **Playwright placeholder** — activates automatically once an `e2e/`
-   directory exists. Use `baseURL: https://smartscrumpoker.localhost.balazskrizsan.com`
-   and `ignoreHTTPSErrors: true` (self-signed cert).
+8. **Playwright e2e** — runs the tests in `e2e/` (skipped if the dir is
+   absent): `npm ci` -> `playwright install --with-deps chromium` ->
+   `playwright test`. `E2E_BASE_URL` feeds `baseURL`
+   (`https://smartscrumpoker.localhost.balazskrizsan.com`) and the config
+   sets `ignoreHTTPSErrors: true` for the self-signed cert. First spec:
+   `e2e/tests/homepage.spec.ts` asserts the landing page renders the
+   "Smart Scrum Poker" and "Smarter Estimations for Agile Teams" texts.
 9. On failure: pods, events and container logs are dumped to the job log.
 
 ## Required GitHub secret

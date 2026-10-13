@@ -11,6 +11,7 @@ on:
       - 'src/app-groups/ssp/**'
       - '.github/workflows/pr-e2e-stack.yml'
       - '.github/ci/**'
+      - 'e2e/**'
   workflow_dispatch:
 
 env:
@@ -169,11 +170,13 @@ jobs:
           echo "== ids discovery =="
           curl -sk "https://ids--smartscrumpoker.localhost.balazskrizsan.com/.well-known/openid-configuration" | head -c 400; echo
 
-      # ---- step 2 of the epic: real Playwright tests land here --------------
-      - name: Playwright e2e (placeholder)
+      - name: Playwright e2e
         if: hashFiles('e2e/**') != ''
         run: |
-          echo "TODO: npm ci && npx playwright test (baseURL: $E2E_BASE_URL, ignoreHTTPSErrors: true)"
+          cd e2e
+          npm ci
+          npx playwright install --with-deps chromium
+          npx playwright test
 
       - name: Debug dump on failure
         if: failure()
