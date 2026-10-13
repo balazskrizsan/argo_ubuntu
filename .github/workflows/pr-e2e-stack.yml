@@ -110,7 +110,12 @@ jobs:
             echo "::error::SSP_SECRETS_YAML GitHub secret is empty"
             exit 1
           fi
-          printf '%s\n' "$SSP_SECRETS_YAML" | kubectl -n "$K8S_NAMESPACE" apply -f -
+          printf '%s\n' "$SSP_SECRETS_YAML" > /tmp/gha-secrets.yaml
+          # Normalize metadata.namespace -> $K8S_NAMESPACE: the manifest is
+          # typically copied from cloud-secrets-local.yaml, which carries
+          # `namespace: ssp-local` and would fail `kubectl -n ssp-ci apply`.
+          sed -i -E "s/^(  namespace: ).*/\1$K8S_NAMESPACE/" /tmp/gha-secrets.yaml
+          kubectl -n "$K8S_NAMESPACE" apply -f /tmp/gha-secrets.yaml
           kubectl -n "$K8S_NAMESPACE" get secret cloud-secrets
 
       - name: Deploy SSP stack (kubectl apply -k)

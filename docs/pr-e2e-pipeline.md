@@ -62,6 +62,11 @@ Actions). The whole Secret YAML is stored as the value; it **must contain
 account for sops KMS + AWS S3 paths). It may also contain additional Secret
 documents, e.g. `aws-services-secrets` as a pre-seeded fallback.
 
+The workflow applies it exactly like `src/scripts/local/apply-cloud-secrets-local.sh`
+does (`kubectl apply -f`), except from stdin/`/tmp` instead of a committed file.
+Before applying it rewrites every `metadata.namespace` to `ssp-ci`, so the
+manifest can be copied verbatim from `cloud-secrets-local.yaml`.
+
 ## Differences vs the real `local` stack
 
 - cert-manager Job excluded — `env-cert` is self-signed in CI.
