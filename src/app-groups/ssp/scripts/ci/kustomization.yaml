@@ -5,25 +5,42 @@ kind: Kustomization
 # CI overlay for the GitHub Actions PR pipeline (kind cluster, ubuntu-latest).
 #
 # Same app set as `scripts/local`, with these differences:
-#   - NO cert-manager / secret-manager Jobs -> they would need real AWS S3
-#     (certificate download) and GCP KMS (sops decrypt) access, which we do
-#     not want inside GHA. The workflow creates `env-cert` (self-signed,
-#     *.localhost.balazskrizsan.com) and `aws-services-secrets` itself.
-#   - namespace-config ConfigMap is skipped (only consumed by those Jobs).
+#   - secret-manager Job (sops -> aws-services-secrets) RUNS in CI: its
+#     `cloud-secrets` envFrom input is created by the workflow from the
+#     SSP_SECRETS_YAML GitHub secret before `kubectl apply -k`.
+#   - NO cert-manager Job -> would need AWS S3 access to fetch the real cert.
+#     The workflow creates `env-cert` itself (self-signed,
+#     *.localhost.balazskrizsan.com).
 #   - fluent-bit is KEPT: identity-service/local patches the fluent-bit-env
 #     ConfigMap, so removing it would break `kubectl apply -k`.
-#   - Namespace stays `ssp-local`: aws-services/local hardcodes
-#     `ids.ssp-local.svc.cluster.local` in OIDC_INTROSPECTION_URI.
+#   - Namespace is `ssp-ci` (not `ssp-local`). aws-services/local hardcodes
+#     `ids.ssp-local.svc.cluster.local` in OIDC_INTROSPECTION_URI -> patched
+#     below to `ssp-ci`.
+#   - secret-manager-rbac.yaml: the Job uses the `default` SA; the repo's
+#     cluster-config cannot be reused (its kustomization references a
+#     non-existent apps/common/templates dir).
 #
 # Image tags: the workflow appends an `images:` block to this file at runtime,
 # resolved from the PR diff (any overlay) with `local` tags as fallback.
 # ---------------------------------------------------------------------------
-namespace: ssp-local
+namespace: ssp-ci
 
 resources:
+  # namespace-config feeds NAMESPACE_NAME into the secret-manager Job (envFrom)
+  - namespace-config.yaml
+  - secret-manager-rbac.yaml
   - ../../apps/common/insecure-config
+  - ../../apps/common/secret-manager
   - ../../apps/fluent-bit/local
   - ../../apps/aws-services/local
   - ../../apps/identity-service/local
   - ../../apps/backend/local
   - ../../apps/frontend/local
+
+patches:
+  # aws-services/local hardcodes the ids FQDN with the ssp-local namespace
+  - target: { group: "", version: "v1", kind: "ConfigMap", name: "aws-services-config" }
+    patch: |-
+      - op: replace
+        path: /data/OIDC_INTROSPECTION_URI
+        value: http://ids.ssp-ci.svc.cluster.local:4043/connect/introspect

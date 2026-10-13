@@ -36,28 +36,44 @@
    exactly the versions the PR ships.
 3. **Create a kind cluster** (`.github/ci/kind-config.yaml`): port mappings
    80/443 for ingress-nginx, `extraMounts` for the hostPath PVs used by the
-   `ssp-local` overlay.
+   `ssp-ci` overlay.
 4. **Install ingress-nginx** (kind provider manifest).
 5. **Create namespace + secrets**: `env-cert` is a self-signed
-   `*.localhost.balazskrizsan.com` cert; `aws-services-secrets` is applied from
-   `src/secerts/aws-services.prod.secrets.dec.yaml`. The real
-   cert-manager / secret-manager Jobs are intentionally **excluded** from the
-   CI overlay (they would need AWS S3 + GCP KMS access in GHA).
-6. **Deploy** `kubectl apply -k src/app-groups/ssp/scripts/ci` and wait for all
-   rollouts.
+   `*.localhost.balazskrizsan.com` cert; `cloud-secrets` comes from the
+   **`SSP_SECRETS_YAML` GitHub secret** — a full Secret manifest stored as the
+   secret value (may contain multiple `---` separated Secret docs). The
+   cert-manager Job stays **excluded** (it would fetch the real cert from S3);
+   the **secret-manager Job runs** (see next step).
+6. **Deploy** `kubectl apply -k src/app-groups/ssp/scripts/ci`, then wait for
+   the `secret-manager-job` — it downloads the encrypted secrets from S3 and
+   decrypts them via sops + GCP KMS into `aws-services-secrets` — before
+   waiting for the deployment rollouts.
 7. **Smoke check** frontend + IDS discovery endpoint over HTTPS.
 8. **Playwright placeholder** — activates automatically once an `e2e/`
    directory exists. Use `baseURL: https://smartscrumpoker.localhost.balazskrizsan.com`
    and `ignoreHTTPSErrors: true` (self-signed cert).
 9. On failure: pods, events and container logs are dumped to the job log.
 
+## Required GitHub secret
+
+**`SSP_SECRETS_YAML`** — repo secret (Settings -> Secrets and variables ->
+Actions). The whole Secret YAML is stored as the value; it **must contain
+`cloud-secrets`** (consumed via envFrom by the secret-manager Job: GCP service
+account for sops KMS + AWS S3 paths). It may also contain additional Secret
+documents, e.g. `aws-services-secrets` as a pre-seeded fallback.
+
 ## Differences vs the real `local` stack
 
-- **No** cert-manager / secret-manager Jobs, no `cloud-secrets`, no `namespace-config`.
+- cert-manager Job excluded — `env-cert` is self-signed in CI.
+- secret-manager Job **runs**, fed by `SSP_SECRETS_YAML` instead of the
+  committed `src/secerts/cloud-secrets-*.yaml`.
 - fluent-bit **is kept** — `identity-service/local` patches its `fluent-bit-env`
   ConfigMap, so removing it would break `kubectl apply -k`.
-- Namespace stays `ssp-local` because `aws-services/local` hardcodes
-  `ids.ssp-local.svc.cluster.local` in `OIDC_INTROSPECTION_URI`.
+- Namespace is `ssp-ci` (isolated from `ssp-local`); the ci overlay patches
+  `aws-services-config`'s hardcoded `ids.ssp-local...` OIDC URI to `ssp-ci`
+  and ships its own minimal Role/RoleBinding for the secret-manager Job's
+  `default` ServiceAccount (the repo's `cluster-config` kustomization is
+  broken — it references a non-existent `apps/common/templates` dir).
 
 ## Enabling the merge gate
 
@@ -75,6 +91,7 @@ Without this the workflow runs but does not block merges.
   which is the intended gate behavior.
 - The workflow triggers on `src/app-groups/ssp/**` changes only; pure
   cluster/grafana/elk PRs are out of scope for now.
-- aws-services talks to real AWS S3 with the committed keys; if CI runs should
-  never touch real buckets, replace `aws-services.prod.secrets.dec.yaml` with
-  dummy values via `kubectl create secret generic` in the workflow.
+- The sops Job downloads the encrypted secrets from real AWS S3 and decrypts
+  via real GCP KMS — both come from `SSP_SECRETS_YAML`. If CI must not touch
+  real buckets, skip `common/secret-manager` in the ci overlay and ship an
+  `aws-services-secrets` Secret doc inside `SSP_SECRETS_YAML` instead.

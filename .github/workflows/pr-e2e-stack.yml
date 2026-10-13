@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
 
 env:
-  K8S_NAMESPACE: ssp-local
+  K8S_NAMESPACE: ssp-ci
   E2E_BASE_URL: https://smartscrumpoker.localhost.balazskrizsan.com
 
 jobs:
@@ -87,6 +87,11 @@ jobs:
             --timeout=120s
 
       - name: Create namespace and secrets
+        env:
+          # GitHub repo secret: the FULL Secret manifest (apiVersion/kind/
+          # metadata/data). Must contain `cloud-secrets` (feeds the
+          # secret-manager sops Job); may contain further Secret docs.
+          SSP_SECRETS_YAML: ${{ secrets.SSP_SECRETS_YAML }}
         run: |
           set -euo pipefail
           kubectl create namespace "$K8S_NAMESPACE"
@@ -100,13 +105,28 @@ jobs:
           kubectl -n "$K8S_NAMESPACE" create secret tls env-cert \
             --key /tmp/tls.key --cert /tmp/tls.crt
 
-          # aws-services has a mandatory secretRef on `aws-services-secrets`.
-          # The real one is produced by the secret-manager Job (S3 + sops);
-          # in CI we apply the committed .dec.yaml instead.
-          kubectl -n "$K8S_NAMESPACE" apply -f src/secerts/aws-services.prod.secrets.dec.yaml
+          # cloud-secrets (+ optional extra secrets) from the GitHub secret.
+          if [ -z "${SSP_SECRETS_YAML}" ]; then
+            echo "::error::SSP_SECRETS_YAML GitHub secret is empty"
+            exit 1
+          fi
+          printf '%s\n' "$SSP_SECRETS_YAML" | kubectl -n "$K8S_NAMESPACE" apply -f -
+          kubectl -n "$K8S_NAMESPACE" get secret cloud-secrets
 
       - name: Deploy SSP stack (kubectl apply -k)
         run: kubectl apply -k src/app-groups/ssp/scripts/ci
+
+      # sops Job: downloads the encrypted secret from S3, decrypts via GCP KMS,
+      # creates `aws-services-secrets`. Must finish before aws-services can start.
+      - name: Wait for secret-manager Job (sops)
+        run: |
+          set -euo pipefail
+          if ! kubectl -n "$K8S_NAMESPACE" wait \
+              --for=condition=complete job/secret-manager-job --timeout=180s; then
+            kubectl -n "$K8S_NAMESPACE" logs job/secret-manager-job --tail=100 || true
+            exit 1
+          fi
+          kubectl -n "$K8S_NAMESPACE" get secret aws-services-secrets
 
       - name: Wait for rollouts
         run: |
@@ -145,6 +165,8 @@ jobs:
         run: |
           kubectl -n "$K8S_NAMESPACE" get pods -o wide || true
           kubectl -n "$K8S_NAMESPACE" get events --sort-by=.lastTimestamp | tail -40 || true
+          echo "===== logs: secret-manager-job ====="
+          kubectl -n "$K8S_NAMESPACE" logs job/secret-manager-job --tail=100 || true
           for d in backend backend-psql ids ids-psql aws-services frontend; do
             echo "===== logs: $d ====="
             kubectl -n "$K8S_NAMESPACE" logs "deployment/$d" --all-containers --tail=80 || true
