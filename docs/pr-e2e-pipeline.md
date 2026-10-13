@@ -80,6 +80,9 @@ manifest can be copied verbatim from `cloud-secrets-local.yaml`.
   `SSP_SECRETS_YAML` (otherwise deleted before it can fail).
 - fluent-bit **is kept** — `identity-service/local` patches its `fluent-bit-env`
   ConfigMap, so removing it would break `kubectl apply -k`.
+- The ids deployment's probes are overridden: the template's
+  `periodSeconds: 300` would delay readiness past any sane rollout timeout
+  in CI (readiness: 10s cadence; liveness: generous but bounded).
 - Namespace is `ssp-ci` (isolated from `ssp-local`); the ci overlay patches
   `aws-services-config`'s hardcoded `ids.ssp-local...` OIDC URI to `ssp-ci`
   and ships its own minimal Role/RoleBinding for the secret-manager Job's

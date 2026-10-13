@@ -44,3 +44,29 @@ patches:
       - op: replace
         path: /data/OIDC_INTROSPECTION_URI
         value: http://ids.ssp-ci.svc.cluster.local:4043/connect/introspect
+  # ids template probes are tuned for a long-lived dev box: periodSeconds=300
+  # means a failed first probe (app still migrating) delays readiness past
+  # the rollout timeout. CI gets a fast readiness cadence; liveness stays
+  # generous so a slow first boot doesn't cause a restart loop.
+  - target: { group: "apps", version: "v1", kind: "Deployment", name: "ids" }
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/readinessProbe
+        value:
+          httpGet:
+            path: /.well-known/openid-configuration
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 10
+          failureThreshold: 30
+      - op: replace
+        path: /spec/template/spec/containers/0/livenessProbe
+        value:
+          httpGet:
+            path: /.well-known/openid-configuration
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 10
