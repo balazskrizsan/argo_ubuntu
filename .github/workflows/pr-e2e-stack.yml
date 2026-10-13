@@ -116,16 +116,26 @@ jobs:
           # `namespace: ssp-local` and would fail `kubectl -n ssp-ci apply`.
           sed -i -E "s/^(  namespace: ).*/\1$K8S_NAMESPACE/" /tmp/gha-secrets.yaml
           kubectl -n "$K8S_NAMESPACE" apply -f /tmp/gha-secrets.yaml
-          kubectl -n "$K8S_NAMESPACE" get secret cloud-secrets
+          kubectl -n "$K8S_NAMESPACE" get secrets
+          # cloud-secrets is OPTIONAL: if present, the sops Job below
+          # (re)generates aws-services-secrets; if absent, the YAML above
+          # must already contain aws-services-secrets.
 
       - name: Deploy SSP stack (kubectl apply -k)
         run: kubectl apply -k src/app-groups/ssp/scripts/ci
 
       # sops Job: downloads the encrypted secret from S3, decrypts via GCP KMS,
-      # creates `aws-services-secrets`. Must finish before aws-services can start.
+      # creates `aws-services-secrets`. Only needed if `cloud-secrets` was in
+      # SSP_SECRETS_YAML; otherwise aws-services-secrets is injected directly.
       - name: Wait for secret-manager Job (sops)
         run: |
           set -euo pipefail
+          if ! kubectl -n "$K8S_NAMESPACE" get secret cloud-secrets >/dev/null 2>&1; then
+            echo "cloud-secrets not provided -> skipping sops Job"
+            kubectl -n "$K8S_NAMESPACE" delete job secret-manager-job --ignore-not-found
+            kubectl -n "$K8S_NAMESPACE" get secret aws-services-secrets
+            exit 0
+          fi
           if ! kubectl -n "$K8S_NAMESPACE" wait \
               --for=condition=complete job/secret-manager-job --timeout=180s; then
             kubectl -n "$K8S_NAMESPACE" logs job/secret-manager-job --tail=100 || true

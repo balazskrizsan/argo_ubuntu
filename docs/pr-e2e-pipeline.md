@@ -42,12 +42,15 @@
    `*.localhost.balazskrizsan.com` cert; `cloud-secrets` comes from the
    **`SSP_SECRETS_YAML` GitHub secret** — a full Secret manifest stored as the
    secret value (may contain multiple `---` separated Secret docs). The
-   cert-manager Job stays **excluded** (it would fetch the real cert from S3);
-   the **secret-manager Job runs** (see next step).
-6. **Deploy** `kubectl apply -k src/app-groups/ssp/scripts/ci`, then wait for
-   the `secret-manager-job` — it downloads the encrypted secrets from S3 and
-   decrypts them via sops + GCP KMS into `aws-services-secrets` — before
-   waiting for the deployment rollouts.
+   cert-manager Job stays **excluded** (it would fetch the real cert from S3).
+6. **Deploy** `kubectl apply -k src/app-groups/ssp/scripts/ci`, then handle
+   `aws-services-secrets` in one of two modes:
+   - if `cloud-secrets` was in `SSP_SECRETS_YAML`: wait for `secret-manager-job`,
+     which downloads the encrypted secrets from S3 and decrypts them via
+     sops + GCP KMS into `aws-services-secrets`;
+   - if not: `aws-services-secrets` must already be in `SSP_SECRETS_YAML`
+     (this is the current setup) and the sops Job is deleted.
+   Only then wait for the deployment rollouts.
 7. **Smoke check** frontend + IDS discovery endpoint over HTTPS.
 8. **Playwright placeholder** — activates automatically once an `e2e/`
    directory exists. Use `baseURL: https://smartscrumpoker.localhost.balazskrizsan.com`
@@ -57,10 +60,13 @@
 ## Required GitHub secret
 
 **`SSP_SECRETS_YAML`** — repo secret (Settings -> Secrets and variables ->
-Actions). The whole Secret YAML is stored as the value; it **must contain
-`cloud-secrets`** (consumed via envFrom by the secret-manager Job: GCP service
-account for sops KMS + AWS S3 paths). It may also contain additional Secret
-documents, e.g. `aws-services-secrets` as a pre-seeded fallback.
+Actions). The whole Secret YAML is stored as the value (may contain multiple
+`---` separated Secret docs). Two supported modes:
+
+- **`aws-services-secrets` only** (current) — injected as-is, the sops Job is
+  skipped. Simplest, no S3/KMS calls in CI.
+- **`cloud-secrets` present** — the sops Job runs and generates
+  `aws-services-secrets` itself (GCP SA for KMS + AWS S3 paths come from it).
 
 The workflow applies it exactly like `src/scripts/local/apply-cloud-secrets-local.sh`
 does (`kubectl apply -f`), except from stdin/`/tmp` instead of a committed file.
@@ -70,8 +76,8 @@ manifest can be copied verbatim from `cloud-secrets-local.yaml`.
 ## Differences vs the real `local` stack
 
 - cert-manager Job excluded — `env-cert` is self-signed in CI.
-- secret-manager Job **runs**, fed by `SSP_SECRETS_YAML` instead of the
-  committed `src/secerts/cloud-secrets-*.yaml`.
+- secret-manager Job runs only when `cloud-secrets` is provided in
+  `SSP_SECRETS_YAML` (otherwise deleted before it can fail).
 - fluent-bit **is kept** — `identity-service/local` patches its `fluent-bit-env`
   ConfigMap, so removing it would break `kubectl apply -k`.
 - Namespace is `ssp-ci` (isolated from `ssp-local`); the ci overlay patches
