@@ -222,6 +222,22 @@ jobs:
           echo "== collected log files =="
           find "$OUT" -type f | sort
 
+          # Also echo every log into the step output (collapsible groups), so a
+          # single log can be read in the browser without downloading the zip.
+          # Files >300KB are truncated to head+tail; full content stays in the
+          # artifact.
+          while IFS= read -r f; do
+            echo "::group::$f"
+            if [ "$(wc -c < "$f")" -gt 300000 ]; then
+              head -n 300 "$f"
+              echo "... [truncated in step output, full log in artifact] ..."
+              tail -n 300 "$f"
+            else
+              cat "$f"
+            fi
+            echo "::endgroup::"
+          done < <(find "$OUT" -type f | sort)
+
       - name: Upload pod logs artifact
         if: always()
         uses: actions/upload-artifact@v4
