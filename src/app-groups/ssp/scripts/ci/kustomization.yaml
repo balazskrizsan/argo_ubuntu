@@ -11,8 +11,10 @@ kind: Kustomization
 #   - NO cert-manager Job -> would need AWS S3 access to fetch the real cert.
 #     The workflow creates `env-cert` itself (self-signed,
 #     *.localhost.balazskrizsan.com).
-#   - fluent-bit is KEPT: identity-service/local patches the fluent-bit-env
-#     ConfigMap, so removing it would break `kubectl apply -k`.
+#   - fluent-bit is NOT deployed: no ELK/logstash in CI (pod logs are dumped
+#     by the workflow before teardown instead). The `fluent-bit-env`
+#     ConfigMap is still generated below: identity-service/local patches it
+#     (`app_name`), so it must exist or `kubectl apply -k` would fail.
 #   - Namespace is `ssp-ci` (not `ssp-local`). aws-services/local hardcodes
 #     `ids.ssp-local.svc.cluster.local` in OIDC_INTROSPECTION_URI -> patched
 #     below to `ssp-ci`.
@@ -31,11 +33,24 @@ resources:
   - secret-manager-rbac.yaml
   - ../../apps/common/insecure-config
   - ../../apps/common/secret-manager
-  - ../../apps/fluent-bit/local
   - ../../apps/aws-services/local
   - ../../apps/identity-service/local
   - ../../apps/backend/local
   - ../../apps/frontend/local
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+# fluent-bit-env copied from apps/fluent-bit/local so CI can configure it
+# (and so the identity-service/local `app_name` patch still has a target).
+# No logstash exists in CI -> disabled values.
+configMapGenerator:
+  - name: fluent-bit-env
+    literals:
+      - env=CI
+      - logstash_host=disabled
+      - logstash_port=0
+      - app_name=ssp-ci
 
 patches:
   # aws-services/local hardcodes the ids FQDN with the ssp-local namespace
@@ -70,3 +85,35 @@ patches:
           periodSeconds: 30
           timeoutSeconds: 10
           failureThreshold: 10
+
+### No ELK in CI: apps must not write directly to logstash.
+
+  - target: { group: "", version: "v1", kind: "ConfigMap", name: "ids-config" }
+    patch: |-
+      - op: replace
+        path: /data/Logging__LogstashEnabled
+        value: "false"
+      - op: replace
+        path: /data/Logging__LogstashHost
+        value: disabled
+      - op: replace
+        path: /data/Logging__LogstashPort
+        value: "1111"
+
+  - target: { group: "", version: "v1", kind: "ConfigMap", name: "backend-config" }
+    patch: |-
+      - op: replace
+        path: /data/LOGBACK_LOGSTASH_ENABLED
+        value: "false"
+      - op: replace
+        path: /data/LOGBACK_LOGSTASH_FULL_HOST
+        value: ""
+
+  - target: { group: "", version: "v1", kind: "ConfigMap", name: "aws-services-config" }
+    patch: |-
+      - op: replace
+        path: /data/LOGBACK_LOGSTASH_ENABLED
+        value: "false"
+      - op: replace
+        path: /data/LOGBACK_LOGSTASH_FULL_HOST
+        value: ""
