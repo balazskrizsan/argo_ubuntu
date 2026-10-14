@@ -11,12 +11,15 @@ test.describe('frontend login flow', () => {
   test('clicking login redirects to the identity server', async ({ page }) => {
     await page.goto('/');
 
-    // Wait for the full navigation to the identity server so the URL
-    // assertion runs after the redirect, not during it.
-    await Promise.all([
-      page.waitForURL(IDS_HOST_PATTERN),
-      page.getByRole('button', { name: /log.?in/i }).first().click(),
-    ]);
+    // The navbar "Login" is a plain clickable div (authService.login() in
+    // app.component.ts), not a <button> -> role selectors won't match it.
+    await page.getByText('Login', { exact: true }).click();
+
+    // authService.login() performs an async OIDC redirect (metadata fetch,
+    // then window.location to /connect/authorize -> /Account/Login), so the
+    // browser may sit on the frontend URL for a moment: poll with toHaveURL
+    // instead of waitForURL.
+    await expect(page).toHaveURL(IDS_HOST_PATTERN);
 
     // The identity server's login page renders the "Multi-login" heading.
     await expect(
