@@ -86,6 +86,35 @@ patches:
           timeoutSeconds: 10
           failureThreshold: 10
 
+  # The psql deployments have no probes: they report Ready as soon as the
+  # container starts, while postgres is still running initdb. `rollout
+  # status` then "passes" early and the app services crash on
+  # "connection refused". pg_isready makes rollout status actually mean
+  # "accepting connections".
+  - target: { group: "apps", version: "v1", kind: "Deployment", name: "backend-psql" }
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/readinessProbe
+        value:
+          exec:
+            command: ["pg_isready", "-h", "localhost", "-p", "5432"]
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 60
+
+  - target: { group: "apps", version: "v1", kind: "Deployment", name: "ids-psql" }
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/readinessProbe
+        value:
+          exec:
+            command: ["pg_isready", "-h", "localhost", "-p", "5432"]
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 60
+
 ### No ELK in CI: apps must not write directly to logstash.
 
   - target: { group: "", version: "v1", kind: "ConfigMap", name: "ids-config" }
