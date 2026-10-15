@@ -1,0 +1,27 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: pr-e2e
+nodes:
+  - role: control-plane
+    kubeadmConfigPatches:
+      - |
+        kind: InitConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "ingress-ready=true"
+    # ingress-nginx NodePort -> runner localhost
+    extraPortMappings:
+      - containerPort: 80
+        hostPort: 80
+        protocol: TCP
+      - containerPort: 443
+        hostPort: 443
+        protocol: TCP
+    # hostPath PVs used by the ssp-local overlay (kind creates the host dirs)
+    extraMounts:
+      - hostPath: /tmp/ssp-pv/backend-psql
+        containerPath: /mnt/ssp/ssp__backend__local__psql__persistent_volume
+      - hostPath: /tmp/ssp-pv/ids-psql
+        containerPath: /mnt/ssp/ssp__ids__local__psql__persistent_volume
+      - hostPath: /tmp/ssp-pv/ids-dpkeys
+        containerPath: /mnt/k8s/ids-dpkeys

@@ -1,0 +1,148 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# ---------------------------------------------------------------------------
+# CI overlay for the GitHub Actions PR pipeline (kind cluster, ubuntu-latest).
+#
+# Same app set as `scripts/local`, with these differences:
+#   - secret-manager Job (sops -> aws-services-secrets) RUNS in CI: its
+#     `cloud-secrets` envFrom input is created by the workflow from the
+#     SSP_SECRETS_YAML GitHub secret before `kubectl apply -k`.
+#   - NO cert-manager Job -> would need AWS S3 access to fetch the real cert.
+#     The workflow creates `env-cert` itself (self-signed,
+#     *.localhost.balazskrizsan.com).
+#   - fluent-bit is NOT deployed: no ELK/logstash in CI (pod logs are dumped
+#     by the workflow before teardown instead). The `fluent-bit-env`
+#     ConfigMap is still generated below: identity-service/local patches it
+#     (`app_name`), so it must exist or `kubectl apply -k` would fail.
+#   - Namespace is `ssp-ci` (not `ssp-local`). aws-services/local hardcodes
+#     `ids.ssp-local.svc.cluster.local` in OIDC_INTROSPECTION_URI -> patched
+#     below to `ssp-ci`.
+#   - secret-manager-rbac.yaml: the Job uses the `default` SA; the repo's
+#     cluster-config cannot be reused (its kustomization references a
+#     non-existent apps/common/templates dir).
+#
+# Image tags: the workflow appends an `images:` block to this file at runtime,
+# resolved from the PR diff (any overlay) with `local` tags as fallback.
+# ---------------------------------------------------------------------------
+namespace: ssp-ci
+
+resources:
+  # namespace-config feeds NAMESPACE_NAME into the secret-manager Job (envFrom)
+  - namespace-config.yaml
+  - secret-manager-rbac.yaml
+  - ../../apps/common/insecure-config
+  - ../../apps/common/secret-manager
+  - ../../apps/aws-services/local
+  - ../../apps/identity-service/local
+  - ../../apps/backend/local
+  - ../../apps/frontend/local
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+# fluent-bit-env copied from apps/fluent-bit/local so CI can configure it
+# (and so the identity-service/local `app_name` patch still has a target).
+# No logstash exists in CI -> disabled values.
+configMapGenerator:
+  - name: fluent-bit-env
+    literals:
+      - env=CI
+      - logstash_host=disabled
+      - logstash_port=0
+      - app_name=ssp-ci
+
+patches:
+  # aws-services/local hardcodes the ids FQDN with the ssp-local namespace
+  - target: { group: "", version: "v1", kind: "ConfigMap", name: "aws-services-config" }
+    patch: |-
+      - op: replace
+        path: /data/OIDC_INTROSPECTION_URI
+        value: http://ids.ssp-ci.svc.cluster.local:4043/connect/introspect
+  # ids template probes are tuned for a long-lived dev box: periodSeconds=300
+  # means a failed first probe (app still migrating) delays readiness past
+  # the rollout timeout. CI gets a fast readiness cadence; liveness stays
+  # generous so a slow first boot doesn't cause a restart loop.
+  - target: { group: "apps", version: "v1", kind: "Deployment", name: "ids" }
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/readinessProbe
+        value:
+          httpGet:
+            path: /.well-known/openid-configuration
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 10
+          failureThreshold: 30
+      - op: replace
+        path: /spec/template/spec/containers/0/livenessProbe
+        value:
+          httpGet:
+            path: /.well-known/openid-configuration
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 10
+
+  # The psql deployments have no probes: they report Ready as soon as the
+  # container starts, while postgres is still running initdb. `rollout
+  # status` then "passes" early and the app services crash on
+  # "connection refused". pg_isready makes rollout status actually mean
+  # "accepting connections".
+  - target: { group: "apps", version: "v1", kind: "Deployment", name: "backend-psql" }
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/readinessProbe
+        value:
+          exec:
+            command: ["pg_isready", "-h", "localhost", "-p", "5432"]
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 60
+
+  - target: { group: "apps", version: "v1", kind: "Deployment", name: "ids-psql" }
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/readinessProbe
+        value:
+          exec:
+            command: ["pg_isready", "-h", "localhost", "-p", "5432"]
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 60
+
+### No ELK in CI: apps must not write directly to logstash.
+
+  - target: { group: "", version: "v1", kind: "ConfigMap", name: "ids-config" }
+    patch: |-
+      - op: replace
+        path: /data/Logging__LogstashEnabled
+        value: "false"
+      - op: replace
+        path: /data/Logging__LogstashHost
+        value: disabled
+      - op: replace
+        path: /data/Logging__LogstashPort
+        value: "1111"
+
+  - target: { group: "", version: "v1", kind: "ConfigMap", name: "backend-config" }
+    patch: |-
+      - op: replace
+        path: /data/LOGBACK_LOGSTASH_ENABLED
+        value: "false"
+      - op: replace
+        path: /data/LOGBACK_LOGSTASH_FULL_HOST
+        value: ""
+
+  - target: { group: "", version: "v1", kind: "ConfigMap", name: "aws-services-config" }
+    patch: |-
+      - op: replace
+        path: /data/LOGBACK_LOGSTASH_ENABLED
+        value: "false"
+      - op: replace
+        path: /data/LOGBACK_LOGSTASH_FULL_HOST
+        value: ""
