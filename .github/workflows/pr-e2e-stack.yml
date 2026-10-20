@@ -144,15 +144,20 @@ jobs:
           fi
           kubectl -n "$K8S_NAMESPACE" get secret aws-services-secrets
 
+      # `kubectl rollout status` has no timestamp option, so each line is
+      # piped through `ts` (millisecond UTC prefix). pipefail keeps kubectl's
+      # exit code. Timestamps can be correlated with the --timestamps pod logs
+      # and events.log collected by the "Collect all pod logs" step below.
       - name: Wait for rollouts
         run: |
           set -euo pipefail
-          kubectl -n "$K8S_NAMESPACE" rollout status deployment/backend-psql   --timeout=180s
-          kubectl -n "$K8S_NAMESPACE" rollout status deployment/ids-psql       --timeout=180s
-          kubectl -n "$K8S_NAMESPACE" rollout status deployment/ids            --timeout=600s
-          kubectl -n "$K8S_NAMESPACE" rollout status deployment/aws-services   --timeout=300s
-          kubectl -n "$K8S_NAMESPACE" rollout status deployment/backend        --timeout=300s
-          kubectl -n "$K8S_NAMESPACE" rollout status deployment/frontend       --timeout=180s
+          ts() { while IFS= read -r l; do printf '%s %s\n' "$(date -u +%H:%M:%S.%3N)" "$l"; done; }
+          kubectl -n "$K8S_NAMESPACE" rollout status deployment/backend-psql   --timeout=180s 2>&1 | ts
+          kubectl -n "$K8S_NAMESPACE" rollout status deployment/ids-psql       --timeout=180s 2>&1 | ts
+          kubectl -n "$K8S_NAMESPACE" rollout status deployment/ids            --timeout=600s 2>&1 | ts
+          kubectl -n "$K8S_NAMESPACE" rollout status deployment/aws-services   --timeout=300s 2>&1 | ts
+          kubectl -n "$K8S_NAMESPACE" rollout status deployment/backend        --timeout=300s 2>&1 | ts
+          kubectl -n "$K8S_NAMESPACE" rollout status deployment/frontend       --timeout=180s 2>&1 | ts
 
       - name: Map hosts and smoke check
         run: |
@@ -177,6 +182,19 @@ jobs:
           npm ci
           npx playwright install --with-deps chromium
           npx playwright test
+
+      # Videos are only recorded on retry attempts (video: 'on-first-retry'),
+      # so test-results/ is empty on a clean pass -> if-no-files-found: ignore.
+      - name: Upload Playwright results artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results-run${{ github.run_number }}-attempt${{ github.run_attempt }}
+          path: |
+            e2e/test-results/
+            e2e/playwright-report/
+          retention-days: 30
+          if-no-files-found: ignore
 
       - name: Debug dump on failure
         if: failure()
