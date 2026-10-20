@@ -1,3 +1,4 @@
+import { promises as fs } from 'node:fs';
 import { test as base, expect, type Page } from '@playwright/test';
 
 /**
@@ -27,8 +28,15 @@ export const test = base.extend<{ page: Page }>({
 
     await use(page);
 
+    const body = lines.join('\n') || '(no console output)';
+
+    // Written to disk unconditionally -> test-results/<test>/browser-console.log
+    // exists even with the `list` reporter where attachments aren't rendered.
+    await fs.writeFile(testInfo.outputPath('browser-console.log'), body);
+
+    // Also attached so it shows up in the HTML report when one is generated.
     await testInfo.attach('browser-console.log', {
-      body: lines.join('\n') || '(no console output)',
+      body,
       contentType: 'text/plain',
     });
   },
