@@ -22,6 +22,11 @@ export default defineConfig({
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'on-first-retry',
+    launchOptions: {
+      // Open DevTools in every tab locally. Chromium-only; it forces headed
+      // mode, so it must stay off in CI where browsers run headless.
+      devtools: !process.env.CI,
+    },
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
