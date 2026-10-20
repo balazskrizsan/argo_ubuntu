@@ -50,10 +50,17 @@ jobs:
             done < <(grab "$f")
           done
 
-          # PR overrides: new side (+) of every changed line, any overlay
+          # PR overrides: new side (+) of every changed line, any overlay.
+          # Exception: the frontend image bakes environment URLs (STS host,
+          # api/wss hosts) into the JS bundle at build time, so only local_*
+          # builds can run in the kind CI env. prod/uat tag bumps (release
+          # commits) are ignored here -> the local fallback tag stays.
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             git fetch --depth=1 origin "${{ github.base_ref }}"
             while read -r img; do
+              case "$img" in
+                *_frontend:*) [[ "$img" == *:local_* ]] || continue ;;
+              esac
               TAGS["${img%%:*}"]="${img##*:}"
             done < <(git diff "origin/${{ github.base_ref }}" HEAD -- 'src/**/*.yaml' \
                       | grep -hoP '^\+\s*-?\s*op:.*|(^\+\s*value:\s*kbalazsworks/\S+)' \
