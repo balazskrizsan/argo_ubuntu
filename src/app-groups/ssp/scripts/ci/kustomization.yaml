@@ -140,6 +140,13 @@ patches:
       - op: replace
         path: /data/LOGBACK_LOGSTASH_FULL_HOST
         value: ""
+      # The PR-tested backend image reads frontend.full.host (=FRONTEND_FULL_HOST)
+      # for the WS /ws setAllowedOrigins check; the local overlay still provides
+      # the old SITE_* names only. Missing value -> placeholder -> every WS
+      # handshake answers HTTP 403. Added here, CI-only, on purpose.
+      - op: add
+        path: /data/FRONTEND_FULL_HOST
+        value: "https://smartscrumpoker.localhost.balazskrizsan.com/"
 
   - target: { group: "", version: "v1", kind: "ConfigMap", name: "aws-services-config" }
     patch: |-
