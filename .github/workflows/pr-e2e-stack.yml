@@ -216,6 +216,28 @@ jobs:
           done
 
       # Runs on success AND failure, before the runner (and the kind cluster
+      # with it) is torn down: dumps every non-system table of both postgres
+      # pods. Output per table: first line is the table name, then psql's
+      # fully bordered (-P border=2) ASCII table -- header row = column
+      # names, below it the rows as stored in the database.
+      - name: Dump SQL tables (ASCII)
+        if: always()
+        run: |
+          set -uo pipefail
+          for dep in backend-psql ids-psql; do
+            echo "::group::$dep"
+            kubectl -n "$K8S_NAMESPACE" exec -i "deploy/$dep" -- sh -s <<'EOSQL' || echo "dump failed for $dep"
+          export PGPASSWORD="$POSTGRES_PASSWORD"
+          for t in $(psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc \
+            "SELECT tablename FROM pg_tables WHERE schemaname NOT IN ('pg_catalog','information_schema') ORDER BY 1"); do
+            echo "$t"
+            psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -P border=2 -c "SELECT * FROM \"$t\""
+          done
+          EOSQL
+            echo "::endgroup::"
+          done
+
+      # Runs on success AND failure, before the runner (and the kind cluster
       # with it) is torn down: every pod log in every namespace is dumped to
       # e2e-pod-logs/<ns>/<pod>__<container>.log and uploaded as an artifact
       # (30-day retention) so it stays downloadable after the run.
