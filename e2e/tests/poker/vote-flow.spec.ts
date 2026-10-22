@@ -71,17 +71,21 @@ test.describe('poker flow', () => {
     await firstTicket.getByRole('button', { name: 'Start', exact: true }).click();
 
     // Voter table appears for the active ticket: one button column per
-    // story-point dimension. Voting the smallest option ("Size S") in every
-    // dimension makes the VOTE button appear (all dims must be > 0).
+    // story-point dimension. The option labels come from the deployed
+    // story-point config ("Size S"/"SMALL" etc. vary across builds), so we
+    // click the FIRST button of each column — that is always the smallest
+    // option (value 1). Voting every dimension makes the VOTE button appear
+    // (all dims must be > 0). The first-button wait also guards the race
+    // where locator.count() would run before the options render.
     const voterTable = page.locator('app-voter-table');
     await expect(voterTable).toBeVisible();
-    const smallestOptions = voterTable.getByRole('button', {
-      name: 'Size S',
-      exact: true,
-    });
-    const optionCount = await smallestOptions.count();
-    for (let i = 0; i < optionCount; i++) {
-      await smallestOptions.nth(i).click();
+    const dimensionColumns = voterTable.locator('div.col');
+    await expect(
+      dimensionColumns.first().locator('button')
+    ).toBeVisible();
+    const columnCount = await dimensionColumns.count();
+    for (let i = 0; i < columnCount; i++) {
+      await dimensionColumns.nth(i).locator('button').first().click();
     }
     await voterTable.getByRole('button', { name: 'VOTE', exact: true }).click();
 
