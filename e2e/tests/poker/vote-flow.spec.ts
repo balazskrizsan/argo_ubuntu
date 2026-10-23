@@ -81,7 +81,7 @@ test.describe('poker flow', () => {
     await expect(voterTable).toBeVisible();
     const dimensionColumns = voterTable.locator('div.col');
     await expect(
-      dimensionColumns.first().locator('button')
+      dimensionColumns.first().locator('button').first()
     ).toBeVisible();
     const columnCount = await dimensionColumns.count();
     for (let i = 0; i < columnCount; i++) {
