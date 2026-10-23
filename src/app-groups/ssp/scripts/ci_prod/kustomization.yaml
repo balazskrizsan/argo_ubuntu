@@ -1,0 +1,103 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# ---------------------------------------------------------------------------
+# CI_PROD overlay for the GitHub Actions PR pipeline (kind cluster).
+#
+# Runs the SAME app manifests as `scripts/ubuntu_prod` — identical image tags
+# and environment variables — so the e2e gate tests what actually ships to
+# prod. Only CI-infra deltas remain:
+#   - namespace `ssp-ci-prod` (isolated namespace in the throwaway cluster).
+#   - `env-cert` is a self-signed `*.smartscrumpoker.com` cert created by the
+#     workflow; the runner maps the prod domains to 127.0.0.1, so the
+#     prod-baked frontend/ids config resolves to the kind ingress unchanged.
+#   - frontend ingress gets a `tls` block: prod terminates TLS upstream and
+#     the template ships none, but kind/ingress-nginx needs it for HTTPS.
+#   - ids readiness/liveness probes shortened (template periodSeconds: 300
+#     would delay readiness past the rollout timeout in CI).
+#   - backend-psql / ids-psql get a pg_isready readinessProbe (the templates
+#     ship none, and the workflow needs a rollout signal).
+#   - secret-manager-rbac.yaml: the Job uses the `default` SA; the repo's
+#     cluster-config cannot be reused (its kustomization references a
+#     non-existent apps/common/templates dir).
+#   - fluent-bit/ubuntu_prod IS deployed for parity; its logstash output
+#     (logstash.elk.svc.cluster.local) does not exist in kind, so it retries
+#     in the background — pod logs are dumped by the workflow anyway.
+#
+# Image tags: the workflow appends an `images:` block to this file at runtime,
+# resolved from the PR diff (any overlay) with `ubuntu_prod` tags as fallback.
+# ---------------------------------------------------------------------------
+namespace: ssp-ci-prod
+
+resources:
+  - namespace-config.yaml
+  - secret-manager-rbac.yaml
+  - ../../apps/common/ubuntu
+  - ../../apps/fluent-bit/ubuntu_prod
+  - ../../apps/aws-services/ubuntu_prod
+  - ../../apps/identity-service/ubuntu_prod
+  - ../../apps/backend/ubuntu_prod
+  - ../../apps/frontend/ubuntu_prod
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+patches:
+  # Prod terminates TLS upstream (no tls in the frontend ingress template);
+  # kind needs it for HTTPS.
+  - target: { group: "networking.k8s.io", version: "v1", kind: "Ingress", name: "frontend" }
+    patch: |-
+      - op: add
+        path: /spec/tls
+        value:
+          - hosts:
+              - smartscrumpoker.com
+            secretName: env-cert
+
+  - target: { group: "apps", version: "v1", kind: "Deployment", name: "ids" }
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/readinessProbe
+        value:
+          httpGet:
+            path: /.well-known/openid-configuration
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 10
+          failureThreshold: 30
+      - op: replace
+        path: /spec/template/spec/containers/0/livenessProbe
+        value:
+          httpGet:
+            path: /.well-known/openid-configuration
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 10
+
+  - target: { group: "apps", version: "v1", kind: "Deployment", name: "backend-psql" }
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/readinessProbe
+        value:
+          exec:
+            command: ["pg_isready", "-h", "localhost", "-p", "5432"]
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 60
+
+  - target: { group: "apps", version: "v1", kind: "Deployment", name: "ids-psql" }
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/readinessProbe
+        value:
+          exec:
+            command: ["pg_isready", "-h", "localhost", "-p", "5432"]
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 60
+

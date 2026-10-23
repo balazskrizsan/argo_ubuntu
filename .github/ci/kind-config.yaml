@@ -17,11 +17,12 @@ nodes:
       - containerPort: 443
         hostPort: 443
         protocol: TCP
-    # hostPath PVs used by the ssp-local overlay (kind creates the host dirs)
+    # hostPath PVs used by the ci_prod overlay = the ubuntu_prod PV paths
+    # (kind creates the host dirs)
     extraMounts:
       - hostPath: /tmp/ssp-pv/backend-psql
-        containerPath: /mnt/ssp/ssp__backend__local__psql__persistent_volume
+        containerPath: /mnt/ssp/ssp__backend__prod__psql__persistent_volume
       - hostPath: /tmp/ssp-pv/ids-psql
-        containerPath: /mnt/ssp/ssp__ids__local__psql__persistent_volume
+        containerPath: /mnt/ssp/ssp__ids__prod__psql__persistent_volume
       - hostPath: /tmp/ssp-pv/ids-dpkeys
         containerPath: /mnt/k8s/ids-dpkeys

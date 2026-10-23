@@ -31,19 +31,21 @@
 2. **Resolve image tags** — scans the PR diff for changed
    `value: kbalazsworks/...` image patches in **any** overlay
    (`local` / `ubuntu_uat` / `ubuntu_prod`); unchanged apps fall back to the
-   `local` overlay tags. The result is appended as a kustomize `images:` block
-   to `src/app-groups/ssp/scripts/ci/kustomization.yaml`, so the cluster runs
-   exactly the versions the PR ships.
+   `ubuntu_prod` overlay tags (**CI_PROD** runs the same images as prod).
+   `local_*`-tagged images are skipped — they bake dev-cluster hosts into
+   the frontend bundle at build time. The result is appended as a kustomize
+   `images:` block to `src/app-groups/ssp/scripts/ci_prod/kustomization.yaml`,
+   so the cluster runs exactly the versions the PR ships.
 3. **Create a kind cluster** (`.github/ci/kind-config.yaml`): port mappings
    80/443 for ingress-nginx, `extraMounts` for the hostPath PVs used by the
-   `ssp-ci` overlay.
+   `ssp-ci-prod` overlay (same paths as `ubuntu_prod`).
 4. **Install ingress-nginx** (kind provider manifest).
 5. **Create namespace + secrets**: `env-cert` is a self-signed
-   `*.localhost.balazskrizsan.com` cert; `cloud-secrets` comes from the
+   `*.smartscrumpoker.com` cert; `cloud-secrets` comes from the
    **`SSP_SECRETS_YAML` GitHub secret** — a full Secret manifest stored as the
    secret value (may contain multiple `---` separated Secret docs). The
    cert-manager Job stays **excluded** (it would fetch the real cert from S3).
-6. **Deploy** `kubectl apply -k src/app-groups/ssp/scripts/ci`, then handle
+6. **Deploy** `kubectl apply -k src/app-groups/ssp/scripts/ci_prod`, then handle
    `aws-services-secrets` in one of two modes:
    - if `cloud-secrets` was in `SSP_SECRETS_YAML`: wait for `secret-manager-job`,
      which downloads the encrypted secrets from S3 and decrypts them via
@@ -51,11 +53,15 @@
    - if not: `aws-services-secrets` must already be in `SSP_SECRETS_YAML`
      (this is the current setup) and the sops Job is deleted.
    Only then wait for the deployment rollouts.
-7. **Smoke check** frontend + IDS discovery endpoint over HTTPS.
+7. **Map hosts + smoke check**: the prod domains (`smartscrumpoker.com`,
+   `api.smartscrumpoker.com`, `identity-service.smartscrumpoker.com`,
+   `api--aws-services.smartscrumpoker.com`) are mapped to 127.0.0.1 on the
+   runner so the prod-baked frontend bundle and the ids issuer URL resolve
+   to the kind ingress unchanged; then frontend + IDS discovery over HTTPS.
 8. **Playwright e2e** — runs the tests in `e2e/` (skipped if the dir is
    absent): `npm ci` -> `playwright install --with-deps chromium` ->
    `playwright test`. `E2E_BASE_URL` feeds `baseURL`
-   (`https://smartscrumpoker.localhost.balazskrizsan.com`) and the config
+   (`https://smartscrumpoker.com`) and the config
    sets `ignoreHTTPSErrors: true` for the self-signed cert. First spec:
    `e2e/tests/homepage.spec.ts` asserts the landing page renders the
    "Smart Scrum Poker" and "Smarter Estimations for Agile Teams" texts.
@@ -74,22 +80,30 @@ Actions). The whole Secret YAML is stored as the value (may contain multiple
 
 The workflow applies it exactly like `src/scripts/local/apply-cloud-secrets-local.sh`
 does (`kubectl apply -f`), except from stdin/`/tmp` instead of a committed file.
-Before applying it rewrites every `metadata.namespace` to `ssp-ci`, so the
+Before applying it rewrites every `metadata.namespace` to `ssp-ci-prod`, so the
 manifest can be copied verbatim from `cloud-secrets-local.yaml`.
 
-## Differences vs the real `local` stack
+## Differences vs `ubuntu_prod` (CI_PROD deltas)
 
-- cert-manager Job excluded — `env-cert` is self-signed in CI.
+The `ci_prod` overlay applies the **same app manifests as `ubuntu_prod`** —
+same image tags, same env vars. The remaining deltas are CI-infra only:
+
+- cert-manager Job excluded — `env-cert` is a self-signed
+  `*.smartscrumpoker.com` cert in CI.
 - secret-manager Job runs only when `cloud-secrets` is provided in
   `SSP_SECRETS_YAML` (otherwise deleted before it can fail).
-- fluent-bit **is kept** — `identity-service/local` patches its `fluent-bit-env`
-  ConfigMap, so removing it would break `kubectl apply -k`.
+- fluent-bit stays deployed (prod parity) — its logstash output does not
+  exist in kind, so it retries in the background; pod logs are dumped by
+  the workflow before teardown anyway.
+- The frontend ingress gets a `tls` block — prod terminates TLS upstream
+  and the template ships none, but kind/ingress-nginx needs it for HTTPS.
 - The ids deployment's probes are overridden: the template's
   `periodSeconds: 300` would delay readiness past any sane rollout timeout
   in CI (readiness: 10s cadence; liveness: generous but bounded).
-- Namespace is `ssp-ci` (isolated from `ssp-local`); the ci overlay patches
-  `aws-services-config`'s hardcoded `ids.ssp-local...` OIDC URI to `ssp-ci`
-  and ships its own minimal Role/RoleBinding for the secret-manager Job's
+- backend-psql / ids-psql get a `pg_isready` readinessProbe — the templates
+  ship none, and the workflow needs a rollout signal.
+- Namespace is `ssp-ci-prod` (isolated from `ssp-prod`); the ci_prod overlay
+  ships its own minimal Role/RoleBinding for the secret-manager Job's
   `default` ServiceAccount (the repo's `cluster-config` kustomization is
   broken — it references a non-existent `apps/common/templates` dir).
 

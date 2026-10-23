@@ -15,8 +15,8 @@ on:
   workflow_dispatch:
 
 env:
-  K8S_NAMESPACE: ssp-ci
-  E2E_BASE_URL: https://smartscrumpoker.localhost.balazskrizsan.com
+  K8S_NAMESPACE: ssp-ci-prod
+  E2E_BASE_URL: https://smartscrumpoker.com
 
 jobs:
   deploy-stack:
@@ -32,34 +32,34 @@ jobs:
 
       # PRs carry new image tags inside apps/*/(*env*)/kustomization.yaml
       # image patches. We collect the NEW image value of every `image` patch
-      # touched by the PR, and fall back to the `local` overlay tags for apps
-      # the PR did not change. Result is appended as an `images:` block to the
-      # ci kustomization (kustomize `images:` matches by repository name, so it
-      # also overrides the tag set by the local overlay patch).
-      - name: Resolve image tags (PR diff -> ci overlay)
+      # touched by the PR, and fall back to the `ubuntu_prod` overlay tags
+      # for apps the PR did not change (CI_PROD runs the same images as
+      # prod). Result is appended as an `images:` block to the ci_prod
+      # kustomization (kustomize `images:` matches by repository name, so it
+      # also overrides the tag set by the ubuntu_prod overlay).
+      - name: Resolve image tags (PR diff -> ci_prod overlay)
         run: |
           set -euo pipefail
           declare -A TAGS
 
           grab() { grep -hoP 'value:\s*kbalazsworks/\S+' "$1" | sed 's/value:\s*//' || true; }
 
-          # fallback: current tags from the local overlays
-          for f in src/app-groups/ssp/apps/*/local/kustomization.yaml; do
+          # fallback: current tags from the ubuntu_prod overlays
+          for f in src/app-groups/ssp/apps/*/ubuntu_prod/kustomization.yaml; do
             while read -r img; do
               TAGS["${img%%:*}"]="${img##*:}"
             done < <(grab "$f")
           done
 
           # PR overrides: new side (+) of every changed line, any overlay.
-          # Exception: the frontend image bakes environment URLs (STS host,
-          # api/wss hosts) into the JS bundle at build time, so only local_*
-          # builds can run in the kind CI env. prod/uat tag bumps (release
-          # commits) are ignored here -> the local fallback tag stays.
+          # `local_*`-tagged builds bake the dev-cluster hosts into the
+          # frontend JS bundle at build time, so they cannot run here ->
+          # skipped; prod/uat (release) tags are picked up.
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             git fetch --depth=1 origin "${{ github.base_ref }}"
             while read -r img; do
               case "$img" in
-                *_frontend:*) [[ "$img" == *:local_* ]] || continue ;;
+                *:local_*) continue ;;
               esac
               TAGS["${img%%:*}"]="${img##*:}"
             done < <(git diff "origin/${{ github.base_ref }}" HEAD -- 'src/**/*.yaml' \
@@ -75,7 +75,7 @@ jobs:
               echo "  - name: ${repo}"
               echo "    newTag: ${TAGS[$repo]}"
             done
-          } >> src/app-groups/ssp/scripts/ci/kustomization.yaml
+          } >> src/app-groups/ssp/scripts/ci_prod/kustomization.yaml
 
           echo "== Effective images =="
           for repo in "${!TAGS[@]}"; do echo "${repo}:${TAGS[$repo]}"; done | sort
@@ -108,8 +108,8 @@ jobs:
           # Self-signed wildcard; Playwright must run with ignoreHTTPSErrors.
           openssl req -x509 -newkey rsa:2048 -nodes -days 1 \
             -keyout /tmp/tls.key -out /tmp/tls.crt \
-            -subj "/CN=*.localhost.balazskrizsan.com" \
-            -addext "subjectAltName=DNS:*.localhost.balazskrizsan.com,DNS:localhost.balazskrizsan.com"
+            -subj "/CN=*.smartscrumpoker.com" \
+            -addext "subjectAltName=DNS:*.smartscrumpoker.com,DNS:smartscrumpoker.com"
           kubectl -n "$K8S_NAMESPACE" create secret tls env-cert \
             --key /tmp/tls.key --cert /tmp/tls.crt
 
@@ -130,7 +130,7 @@ jobs:
           # must already contain aws-services-secrets.
 
       - name: Deploy SSP stack (kubectl apply -k)
-        run: kubectl apply -k src/app-groups/ssp/scripts/ci
+        run: kubectl apply -k src/app-groups/ssp/scripts/ci_prod
 
       # sops Job: downloads the encrypted secret from S3, decrypts via GCP KMS,
       # creates `aws-services-secrets`. Only needed if `cloud-secrets` was in
@@ -169,18 +169,21 @@ jobs:
       - name: Map hosts and smoke check
         run: |
           set -euo pipefail
+          # CI_PROD runs the prod manifests/images, so the prod domains are
+          # mapped to the kind ingress on the runner — the prod-baked frontend
+          # JS and the ids issuer URL resolve unchanged.
           for h in \
-            smartscrumpoker.localhost.balazskrizsan.com \
-            api--smartscrumpoker.localhost.balazskrizsan.com \
-            ids--smartscrumpoker.localhost.balazskrizsan.com \
-            api--aws-services--smartscrumpoker.localhost.balazskrizsan.com; do
+            smartscrumpoker.com \
+            api.smartscrumpoker.com \
+            identity-service.smartscrumpoker.com \
+            api--aws-services.smartscrumpoker.com; do
             grep -q "$h" /etc/hosts || echo "127.0.0.1 $h" | sudo tee -a /etc/hosts
           done
 
           echo "== frontend =="
           curl -sk -o /dev/null -w '%{http_code}\n' "$E2E_BASE_URL"
           echo "== ids discovery =="
-          curl -sk "https://ids--smartscrumpoker.localhost.balazskrizsan.com/.well-known/openid-configuration" | head -c 400; echo
+          curl -sk "https://identity-service.smartscrumpoker.com/.well-known/openid-configuration" | head -c 400; echo
 
       - name: Playwright e2e
         if: hashFiles('e2e/**') != ''
