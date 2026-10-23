@@ -17,6 +17,9 @@ kind: Kustomization
 #     would delay readiness past the rollout timeout in CI).
 #   - backend-psql / ids-psql get a pg_isready readinessProbe (the templates
 #     ship none, and the workflow needs a rollout signal).
+#   - ids `AwsServices__FullUrl` is patched to the in-cluster Service
+#     (http://aws-services:4073/): the prod value resolves via pod DNS to the
+#     REAL public IP, so pod-side calls would egress to live prod.
 #   - secret-manager-rbac.yaml: the Job uses the `default` SA; the repo's
 #     cluster-config cannot be reused (its kustomization references a
 #     non-existent apps/common/templates dir).
@@ -53,6 +56,27 @@ patches:
           - hosts:
               - smartscrumpoker.com
             secretName: env-cert
+
+  # The backend's WS handshake allowed-origin check reads FRONTEND_FULL_HOST
+  # (the old ci overlay set it explicitly; prod overlays never set it). With
+  # the prod domain it matches the browser's Origin header — without it the
+  # SockJS/STOMP handshake is rejected with 403.
+  - target: { group: "", version: "v1", kind: "ConfigMap", name: "backend-config" }
+    patch: |-
+      - op: add
+        path: /data/FRONTEND_FULL_HOST
+        value: "https://smartscrumpoker.com/"
+
+  # ids -> aws-services must stay in-cluster in kind: the prod value
+  # (https://api--aws-services.smartscrumpoker.com/) resolves via pod DNS to
+  # the REAL public IP, so QuickRegister's call would egress to real prod
+  # and fail introspection there. Internal Service name instead (port 4073
+  # is set by the ubuntu_prod overlay).
+  - target: { group: "", version: "v1", kind: "ConfigMap", name: "ids-config" }
+    patch: |-
+      - op: replace
+        path: /data/AwsServices__FullUrl
+        value: "http://aws-services:4073/"
 
   - target: { group: "apps", version: "v1", kind: "Deployment", name: "ids" }
     patch: |-

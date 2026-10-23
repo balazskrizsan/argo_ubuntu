@@ -102,6 +102,9 @@ same image tags, same env vars. The remaining deltas are CI-infra only:
   in CI (readiness: 10s cadence; liveness: generous but bounded).
 - backend-psql / ids-psql get a `pg_isready` readinessProbe — the templates
   ship none, and the workflow needs a rollout signal.
+- ids `AwsServices__FullUrl` is rewritten to `http://aws-services:4073/` —
+  pod-side DNS would resolve the prod hostname to the real public IP, and
+  the call would egress to live prod (failing introspection there).
 - Namespace is `ssp-ci-prod` (isolated from `ssp-prod`); the ci_prod overlay
   ships its own minimal Role/RoleBinding for the secret-manager Job's
   `default` ServiceAccount (the repo's `cluster-config` kustomization is
