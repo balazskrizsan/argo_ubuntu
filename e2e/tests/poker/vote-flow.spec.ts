@@ -83,11 +83,27 @@ test.describe('poker flow', () => {
     await expect(
       dimensionColumns.first().locator('button').first()
     ).toBeVisible();
-    const columnCount = await dimensionColumns.count();
-    for (let i = 0; i < columnCount; i++) {
-      await dimensionColumns.nth(i).locator('button').first().click();
-    }
-    await voterTable.getByRole('button', { name: 'VOTE', exact: true }).click();
+    const voteButton = voterTable.getByRole('button', {
+      name: 'VOTE',
+      exact: true,
+    });
+    // Every click is verified: a selected option gets .btn-primary. A
+    // mid-round broadcast can re-render the table and wipe an early
+    // selection, so retry unclicked columns until VOTE renders. Columns
+    // already selected are skipped so a re-click can't toggle them off.
+    await expect(async () => {
+      const columnCount = await dimensionColumns.count();
+      for (let i = 0; i < columnCount; i++) {
+        const column = dimensionColumns.nth(i);
+        const selected = column.locator('button.btn-primary');
+        if ((await selected.count()) === 0) {
+          await column.locator('button').first().click();
+        }
+        await expect(selected).toHaveCount(1, { timeout: 1_000 });
+      }
+      await expect(voteButton).toBeVisible({ timeout: 1_000 });
+    }).toPass();
+    await voteButton.click();
 
     // VoteService.addVote() keys the incoming vote by state.activeTicketId,
     // and endTicket() resets that to 0 synchronously — so the RECEIVE_POKER_VOTE
