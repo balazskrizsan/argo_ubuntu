@@ -4,7 +4,8 @@
  ArgoCD repo
       │ PR (image tags / cluster changes)
       ▼
- GitHub Actions  ── .github/workflows/pr-e2e-stack.yml
+ GitHub Actions  ── .github/workflows/pr-e2e-prod-test.yaml
+                 └─ .github/workflows/pr-e2e-uat-test.yaml
       │
       ├───────────────┐
       │               │
@@ -27,51 +28,67 @@
 
 ## What the workflow does
 
+There are **two sibling workflows**: `pr-e2e-prod-test.yaml` (deploys the
+`ci_prod` overlay into `ssp-ci-prod`, prod domains, `SSP_SECRETS_YAML`) and
+`pr-e2e-uat-test.yaml` (deploys `ci_uat` into `ssp-ci-uat`, uat
+`*.balazskrizsan.com` domains, `SSP_UAT_SECRETS_YAML`). Each only triggers
+on PRs touching the files that affect its own ArgoCD app (`paths:` filter),
+so a prod-only or uat-only change runs exactly one pipeline; shared files
+(`templates`, `common/insecure-config`, `common/secret-manager`) trigger
+both; local-only changes trigger neither. Steps are identical below,
+only the env-specific values differ.
+
 1. **Checkout** the PR head.
 2. **Resolve image tags** — scans the PR diff for changed
-   `value: kbalazsworks/...` image patches in **any** overlay
-   (`local` / `ubuntu_uat` / `ubuntu_prod`); unchanged apps fall back to the
-   `ubuntu_prod` overlay tags (**CI_PROD** runs the same images as prod).
+   `value: kbalazsworks/...` image patches in the workflow's **own** overlay
+   (`apps/*/ubuntu_prod` + `scripts/ubuntu_prod` for prod, `apps/*/ubuntu_uat`
+   + `scripts/ubuntu_uat` for uat); unchanged apps fall back to that
+   overlay's tags (each CI env runs the same images as its real env).
    `local_*`-tagged images are skipped — they bake dev-cluster hosts into
    the frontend bundle at build time. The result is appended as a kustomize
-   `images:` block to `src/app-groups/ssp/scripts/ci_prod/kustomization.yaml`,
+   `images:` block to `scripts/ci_<env>/kustomization.yaml`,
    so the cluster runs exactly the versions the PR ships.
 3. **Create a kind cluster** (`.github/ci/kind-config.yaml`): port mappings
    80/443 for ingress-nginx, `extraMounts` for the hostPath PVs used by the
-   `ssp-ci-prod` overlay (same paths as `ubuntu_prod`).
+   `ssp-ci-prod` / `ssp-ci-uat` overlays (same paths as `ubuntu_prod` /
+   `ubuntu_uat`; both mount sets live in the shared config).
 4. **Install ingress-nginx** (kind provider manifest).
 5. **Create namespace + secrets**: `env-cert` is a self-signed
-   `*.smartscrumpoker.com` cert; `cloud-secrets` comes from the
-   **`SSP_SECRETS_YAML` GitHub secret** — a full Secret manifest stored as the
+   `*.smartscrumpoker.com` (prod) / `*.smartscrumpoker.balazskrizsan.com`
+   (uat) cert; `cloud-secrets` comes from the
+   **`SSP_SECRETS_YAML` / `SSP_UAT_SECRETS_YAML` GitHub secret** — a full
+   Secret manifest stored as the
    secret value (may contain multiple `---` separated Secret docs). The
    cert-manager Job stays **excluded** (it would fetch the real cert from S3).
-6. **Deploy** `kubectl apply -k src/app-groups/ssp/scripts/ci_prod`, then handle
+6. **Deploy** `kubectl apply -k src/app-groups/ssp/scripts/ci_<env>`, then handle
    `aws-services-secrets` in one of two modes:
-   - if `cloud-secrets` was in `SSP_SECRETS_YAML`: wait for `secret-manager-job`,
-     which downloads the encrypted secrets from S3 and decrypts them via
-     sops + GCP KMS into `aws-services-secrets`;
-   - if not: `aws-services-secrets` must already be in `SSP_SECRETS_YAML`
-     (this is the current setup) and the sops Job is deleted.
+   - if `cloud-secrets` was in the env's secrets secret: wait for
+     `secret-manager-job`, which downloads the encrypted secrets from S3 and
+     decrypts them via sops + GCP KMS into `aws-services-secrets`;
+   - if not: `aws-services-secrets` must already be in the env's secrets
+     secret (this is the current setup) and the sops Job is deleted.
    Only then wait for the deployment rollouts.
-7. **Map hosts + smoke check**: the prod domains (`smartscrumpoker.com`,
-   `api.smartscrumpoker.com`, `identity-service.smartscrumpoker.com`,
-   `api--aws-services.smartscrumpoker.com`) are mapped to 127.0.0.1 on the
-   runner so the prod-baked frontend bundle and the ids issuer URL resolve
+7. **Map hosts + smoke check**: the env's domains (prod:
+   `smartscrumpoker.com` etc.; uat: `smartscrumpoker.balazskrizsan.com`
+   etc.) are mapped to 127.0.0.1 on the
+   runner so the baked frontend bundle and the ids issuer URL resolve
    to the kind ingress unchanged; then frontend + IDS discovery over HTTPS.
 8. **Playwright e2e** — runs the tests in `e2e/` (skipped if the dir is
    absent): `npm ci` -> `playwright install --with-deps chromium` ->
    `playwright test`. `E2E_BASE_URL` feeds `baseURL`
-   (`https://smartscrumpoker.com`) and the config
+   (`https://smartscrumpoker.com` for prod,
+   `https://smartscrumpoker.balazskrizsan.com` for uat) and the config
    sets `ignoreHTTPSErrors: true` for the self-signed cert. First spec:
    `e2e/tests/homepage.spec.ts` asserts the landing page renders the
    "Smart Scrum Poker" and "Smarter Estimations for Agile Teams" texts.
 9. On failure: pods, events and container logs are dumped to the job log.
 
-## Required GitHub secret
+## Required GitHub secrets
 
-**`SSP_SECRETS_YAML`** — repo secret (Settings -> Secrets and variables ->
+**`SSP_SECRETS_YAML`** (prod workflow) and **`SSP_UAT_SECRETS_YAML`** (uat
+workflow) — repo secrets (Settings -> Secrets and variables ->
 Actions). The whole Secret YAML is stored as the value (may contain multiple
-`---` separated Secret docs). Two supported modes:
+`---` separated Secret docs). Two supported modes per env:
 
 - **`aws-services-secrets` only** (current) — injected as-is, the sops Job is
   skipped. Simplest, no S3/KMS calls in CI.
@@ -80,13 +97,15 @@ Actions). The whole Secret YAML is stored as the value (may contain multiple
 
 The workflow applies it exactly like `src/scripts/local/apply-cloud-secrets-local.sh`
 does (`kubectl apply -f`), except from stdin/`/tmp` instead of a committed file.
-Before applying it rewrites every `metadata.namespace` to `ssp-ci-prod`, so the
+Before applying it rewrites every `metadata.namespace` to `ssp-ci-prod` /
+`ssp-ci-uat`, so the
 manifest can be copied verbatim from `cloud-secrets-local.yaml`.
 
-## Differences vs `ubuntu_prod` (CI_PROD deltas)
+## Differences vs `ubuntu_prod` / `ubuntu_uat` (CI deltas)
 
-The `ci_prod` overlay applies the **same app manifests as `ubuntu_prod`** —
-same image tags, same env vars. The remaining deltas are CI-infra only:
+Each `ci_<env>` overlay applies the **same app manifests as its real
+overlay** — same image tags, same env vars. The remaining deltas are
+CI-infra only (shown for prod; uat mirrors them with uat domains/ports):
 
 - cert-manager Job excluded — `env-cert` is a self-signed
   `*.smartscrumpoker.com` cert in CI.
@@ -102,10 +121,12 @@ same image tags, same env vars. The remaining deltas are CI-infra only:
   in CI (readiness: 10s cadence; liveness: generous but bounded).
 - backend-psql / ids-psql get a `pg_isready` readinessProbe — the templates
   ship none, and the workflow needs a rollout signal.
-- ids `AwsServices__FullUrl` is rewritten to `http://aws-services:4073/` —
-  pod-side DNS would resolve the prod hostname to the real public IP, and
-  the call would egress to live prod (failing introspection there).
-- Namespace is `ssp-ci-prod` (isolated from `ssp-prod`); the ci_prod overlay
+- ids `AwsServices__FullUrl` is rewritten to `http://aws-services:4073/`
+  (prod) / `http://aws-services:4074/` (uat) —
+  pod-side DNS would resolve the env hostname to the real public IP, and
+  the call would egress to the live env (failing introspection there).
+- Namespace is `ssp-ci-prod` / `ssp-ci-uat` (isolated from `ssp-prod` /
+  `ssp-uat`); each ci overlay
   ships its own minimal Role/RoleBinding for the secret-manager Job's
   `default` ServiceAccount (the repo's `cluster-config` kustomization is
   broken — it references a non-existent `apps/common/templates` dir).
@@ -115,17 +136,23 @@ same image tags, same env vars. The remaining deltas are CI-infra only:
 Repo **Settings -> Branches -> branch protection on `master`**:
 
 - enable **Require status checks to pass before merging**
-- add the check: **`Deploy SSP stack to kind`**
+- add the checks: **`Deploy SSP prod stack to kind`** and/or
+  **`Deploy SSP uat stack to kind`**
 
-Without this the workflow runs but does not block merges.
+Without this the workflows run but do not block merges. Note: a path-filtered
+workflow that doesn't run reports no check at all — if both checks are
+required, PRs that touch only one env's files would be unmergeable. Either
+require only the check(s) that can actually run, or accept a single env gate.
 
 ## Known limitations / open questions
 
 - Images are pulled from Docker Hub (`kbalazsworks/*`, public). If a PR bumps
   to a tag that was not pushed yet, the rollout wait will time out -> PR fails,
   which is the intended gate behavior.
-- The workflow triggers on `src/app-groups/ssp/**` changes only; pure
-  cluster/grafana/elk PRs are out of scope for now.
+- The workflows trigger on their own env's `paths:` only (`templates`,
+  `ubuntu_<env>`, shared `common` pieces, `scripts/<env>` + `ci_<env>`, the
+  env's ArgoCD Application, CI infra, `e2e/`); pure local-only,
+  cluster/grafana/elk and `argo-apps/local` PRs run no tests at all.
 - The sops Job downloads the encrypted secrets from real AWS S3 and decrypts
   via real GCP KMS — both come from `SSP_SECRETS_YAML`. If CI must not touch
   real buckets, skip `common/secret-manager` in the ci overlay and ship an

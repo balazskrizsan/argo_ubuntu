@@ -17,12 +17,21 @@ nodes:
       - containerPort: 443
         hostPort: 443
         protocol: TCP
-    # hostPath PVs used by the ci_prod overlay = the ubuntu_prod PV paths
-    # (kind creates the host dirs)
+    # hostPath PVs used by the ci_prod / ci_uat overlays = the ubuntu_prod /
+    # ubuntu_uat PV paths (kind creates the host dirs). Both sets are listed
+    # because one config serves pr-e2e-prod-test.yaml and pr-e2e-uat-test.yaml.
     extraMounts:
+      # --- prod (ssp-ci-prod) ---
       - hostPath: /tmp/ssp-pv/backend-psql
         containerPath: /mnt/ssp/ssp__backend__prod__psql__persistent_volume
       - hostPath: /tmp/ssp-pv/ids-psql
         containerPath: /mnt/ssp/ssp__ids__prod__psql__persistent_volume
       - hostPath: /tmp/ssp-pv/ids-dpkeys
         containerPath: /mnt/k8s/ids-dpkeys
+      # --- uat (ssp-ci-uat) ---
+      - hostPath: /tmp/ssp-pv/backend-psql-uat
+        containerPath: /mnt/ssp/ssp__backend__uat__psql__persistent_volume
+      - hostPath: /tmp/ssp-pv/ids-psql-uat
+        containerPath: /mnt/ssp/ssp__ids__uat__psql__persistent_volume
+      - hostPath: /tmp/ssp-pv/ids-dpkeys-uat
+        containerPath: /mnt/k8s/ids-dpkeys-uat
