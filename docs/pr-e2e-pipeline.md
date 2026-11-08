@@ -4,8 +4,10 @@
  ArgoCD repo
       │ PR (image tags / cluster changes)
       ▼
- GitHub Actions  ── .github/workflows/pr-e2e-prod-test.yaml
-                 └─ .github/workflows/pr-e2e-uat-test.yaml
+ GitHub Actions  ── .github/workflows/pr-e2e-prod-test.yaml  ┐
+                 └─ .github/workflows/pr-e2e-uat-test.yaml   ├ thin callers
+                    .github/workflows/pr-e2e-stack-test.yaml ┘ shared reusable
+                    workflow (all deploy+test steps live here)
       │
       ├───────────────┐
       │               │
@@ -28,15 +30,17 @@
 
 ## What the workflow does
 
-There are **two sibling workflows**: `pr-e2e-prod-test.yaml` (deploys the
-`ci_prod` overlay into `ssp-ci-prod`, prod domains, `SSP_SECRETS_YAML`) and
-`pr-e2e-uat-test.yaml` (deploys `ci_uat` into `ssp-ci-uat`, uat
-`*.balazskrizsan.com` domains, `SSP_UAT_SECRETS_YAML`). Each only triggers
-on PRs touching the files that affect its own ArgoCD app (`paths:` filter),
+There are **two thin caller workflows** — `pr-e2e-prod-test.yaml`
+(stack=prod: `ci_prod` overlay into `ssp-ci-prod`, prod domains) and
+`pr-e2e-uat-test.yaml` (stack=uat: `ci_uat` into `ssp-ci-uat`, uat
+`*.balazskrizsan.com` domains) — plus the **shared reusable workflow**
+`pr-e2e-stack-test.yaml`, which contains the whole deploy+test job and
+derives every env-specific value (namespace, domains, overlay dirs, cert
+CN, cluster/artifact names) from its `stack` input in the
+`Resolve stack config` step. Each caller only carries the `paths:` filter,
 so a prod-only or uat-only change runs exactly one pipeline; shared files
 (`templates`, `common/insecure-config`, `common/secret-manager`) trigger
-both; local-only changes trigger neither. Steps are identical below,
-only the env-specific values differ.
+both; local-only changes trigger neither.
 
 1. **Checkout** the PR head.
 2. **Resolve image tags** — scans the PR diff for changed
@@ -85,10 +89,12 @@ only the env-specific values differ.
 
 ## Required GitHub secrets
 
-**`SSP_SECRETS_YAML`** (prod workflow) and **`SSP_UAT_SECRETS_YAML`** (uat
-workflow) — repo secrets (Settings -> Secrets and variables ->
-Actions). The whole Secret YAML is stored as the value (may contain multiple
-`---` separated Secret docs). Two supported modes per env:
+**`SSP_SECRETS_YAML`** — repo secret (Settings -> Secrets and variables ->
+Actions), currently passed by **both** callers to the reusable workflow's
+`SSP_SECRETS_YAML` secret input. To split secrets per env, create e.g.
+`SSP_UAT_SECRETS_YAML` and map it in `pr-e2e-uat-test.yaml`'s `secrets:`
+block instead. The whole Secret YAML is stored as the value (may contain
+multiple `---` separated Secret docs). Two supported modes per env:
 
 - **`aws-services-secrets` only** (current) — injected as-is, the sops Job is
   skipped. Simplest, no S3/KMS calls in CI.
@@ -136,8 +142,9 @@ CI-infra only (shown for prod; uat mirrors them with uat domains/ports):
 Repo **Settings -> Branches -> branch protection on `master`**:
 
 - enable **Require status checks to pass before merging**
-- add the checks: **`Deploy SSP prod stack to kind`** and/or
-  **`Deploy SSP uat stack to kind`**
+- add the checks: **`deploy-stack / Deploy SSP prod stack to kind`** and/or
+  **`deploy-stack / Deploy SSP uat stack to kind`** (called jobs of a
+  reusable workflow are reported as `<caller job> / <called job>`)
 
 Without this the workflows run but do not block merges. Note: a path-filtered
 workflow that doesn't run reports no check at all — if both checks are
