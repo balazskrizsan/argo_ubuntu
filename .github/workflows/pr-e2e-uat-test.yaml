@@ -116,7 +116,7 @@ jobs:
           # GitHub repo secret: the FULL Secret manifest (apiVersion/kind/
           # metadata/data). Must contain `cloud-secrets` (feeds the
           # secret-manager sops Job); may contain further Secret docs.
-          SSP_SECRETS_YAML: ${{ secrets.SSP_UAT_SECRETS_YAML }}
+          SSP_SECRETS_YAML: ${{ secrets.SSP_SECRETS_YAML }}
         run: |
           set -euo pipefail
           kubectl create namespace "$K8S_NAMESPACE"
@@ -132,7 +132,7 @@ jobs:
 
           # cloud-secrets (+ optional extra secrets) from the GitHub secret.
           if [ -z "${SSP_SECRETS_YAML}" ]; then
-            echo "::error::SSP_UAT_SECRETS_YAML GitHub secret is empty"
+            echo "::error::SSP_SECRETS_YAML GitHub secret is empty"
             exit 1
           fi
           printf '%s\n' "$SSP_SECRETS_YAML" > /tmp/gha-secrets.yaml
@@ -151,7 +151,7 @@ jobs:
 
       # sops Job: downloads the encrypted secret from S3, decrypts via GCP KMS,
       # creates `aws-services-secrets`. Only needed if `cloud-secrets` was in
-      # SSP_UAT_SECRETS_YAML; otherwise aws-services-secrets is injected directly.
+      # SSP_SECRETS_YAML; otherwise aws-services-secrets is injected directly.
       - name: Wait for secret-manager Job (sops)
         run: |
           set -euo pipefail
