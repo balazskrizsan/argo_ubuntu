@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: dev-db
+  name: identity-service-psql-dev
+  labels:
+    app: identity-service-psql-dev-label
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: identity-service-psql-dev-label
+  template:
+    metadata:
+      labels:
+        app: identity-service-psql-dev-label
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16.2
+          ports:
+            - containerPort: 5432
+          imagePullPolicy: IfNotPresent
+          resources: {}
+          env:
+            - name: POSTGRES_USER
+              value: admin
+            - name: POSTGRES_PASSWORD
+              value: admin_pass
+            - name: POSTGRES_DB
+              value: app_db
+            - name: PGDATA
+              value: /data/postgres
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: dev-db
+  name: identity-service-psql-dev
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 4050
+      targetPort: 5432
+  selector:
+    app: identity-service-psql-dev-label
