@@ -1,0 +1,41 @@
+name: PR e2e PROD stack (kind)
+
+# Pipeline position:
+#   PR -> GHA -> kind deploy -> Playwright -> PASS/FAIL -> merge gate -> ArgoCD -> prod
+# This is only the thin caller: the whole deploy+test job lives in the shared
+# reusable workflow pr-e2e-stack-test.yaml (sibling: pr-e2e-uat-test.yaml).
+# To make this a real merge gate, add the `deploy-stack / Deploy SSP prod
+# stack to kind` check as required in the branch protection rules of `master`.
+
+on:
+  pull_request:
+    # Only run when the change can affect what ArgoCD deploys for the SSP
+    # PROD stack: the shared app templates, the ubuntu_prod overlays, the
+    # common manifests used by apps/common/ubuntu (insecure-config +
+    # secret-manager), the ubuntu_prod / ci_prod script overlays, or the SSP
+    # prod Application itself. ubuntu_uat-only files are handled by
+    # pr-e2e-uat-test.yaml; local-only changes trigger neither.
+    paths:
+      - 'src/app-groups/ssp/apps/*/templates/**'
+      - 'src/app-groups/ssp/apps/*/ubuntu_prod/**'
+      - 'src/app-groups/ssp/apps/common/insecure-config/**'
+      - 'src/app-groups/ssp/apps/common/secret-manager/**'
+      - 'src/app-groups/ssp/apps/common/ubuntu/**'
+      - 'src/app-groups/ssp/scripts/ubuntu_prod/**'
+      - 'src/app-groups/ssp/scripts/ci_prod/**'
+      - 'src/argo-apps/ubuntu/ssp--ubuntu--app.yaml'
+      - '.github/workflows/pr-e2e-prod-test.yaml'
+      - '.github/workflows/pr-e2e-stack-test.yaml'
+      - '.github/ci/**'
+      - 'e2e/**'
+  workflow_dispatch:
+
+jobs:
+  deploy-stack:
+    uses: ./.github/workflows/pr-e2e-stack-test.yaml
+    with:
+      stack: prod
+      head_sha: ${{ github.event.pull_request.head.sha || '' }}
+      base_ref: ${{ github.base_ref || '' }}
+    secrets:
+      SSP_SECRETS_YAML: ${{ secrets.SSP_SECRETS_YAML }}
